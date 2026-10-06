@@ -9,6 +9,7 @@
   let { data } = $props();
 
   const fallbackStory = {
+    slug: 'amawbia-august-league-2025',
     title: 'Supporting youth unity through the Amawbia August League.',
     excerpt: 'Queen Tovah Cares Foundation International sponsored the 2025 Amawbia August League football tournament as part of its support for sports, youth engagement and community unity in Anambra.',
     category: 'Youth & Sports',
