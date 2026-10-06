@@ -267,6 +267,57 @@ class SiteProfile(PublishableModel):
         return self.display_name
 
 
+class Announcement(PublishableModel):
+    class Kind(models.TextChoices):
+        INFO = "info", "Information"
+        EVENT = "event", "Event"
+        OPPORTUNITY = "opportunity", "Opportunity"
+        APPEAL = "appeal", "Appeal"
+        URGENT = "urgent", "Urgent"
+
+    title = models.CharField(max_length=180)
+    slug = models.SlugField(max_length=200, unique=True)
+    message = models.CharField(max_length=360)
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.INFO)
+    link_label = models.CharField(max_length=80, blank=True)
+    link_url = models.CharField(max_length=300, blank=True)
+    starts_at = models.DateTimeField(blank=True, null=True)
+    ends_at = models.DateTimeField(blank=True, null=True)
+    dismissible = models.BooleanField(default=True)
+    priority = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-priority", "-published_at", "title"]
+
+    def __str__(self):
+        return self.title
+
+
+class FAQ(PublishableModel):
+    class Category(models.TextChoices):
+        GENERAL = "general", "General"
+        SUPPORT = "support", "Requesting support"
+        GIVING = "giving", "Giving & causes"
+        SCHOLARSHIP = "scholarship", "Scholarships"
+        VOLUNTEER = "volunteer", "Volunteering"
+        PARTNERSHIP = "partnership", "Partnerships"
+
+    question = models.CharField(max_length=260)
+    slug = models.SlugField(max_length=280, unique=True)
+    answer = models.TextField()
+    category = models.CharField(max_length=20, choices=Category.choices, default=Category.GENERAL)
+    featured = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "category", "question"]
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question
+
+
 class VolunteerApplication(models.Model):
     class Status(models.TextChoices):
         NEW = "new", "New"
