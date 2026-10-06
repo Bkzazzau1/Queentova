@@ -3,7 +3,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from core.models import FounderAchievement, FounderProfile, Program, Story
+from core.models import FounderAchievement, FounderProfile, Program, SiteProfile, Story
 
 
 class Command(BaseCommand):
@@ -14,6 +14,20 @@ class Command(BaseCommand):
             "status": "published",
             "published_at": timezone.now(),
         }
+
+        SiteProfile.objects.update_or_create(
+            slug="primary",
+            defaults={
+                "display_name": "Queen Tovah Cares Foundation International",
+                "short_description": (
+                    "Compassion with dignity. Opportunity with purpose. "
+                    "A global outlook rooted in service to people and communities."
+                ),
+                "volunteer_enabled": True,
+                "newsletter_enabled": True,
+                **published,
+            },
+        )
 
         programs = [
             (
