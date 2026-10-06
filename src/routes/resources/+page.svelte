@@ -36,13 +36,8 @@
               <div class="meta"><span>{labels[item.category] || item.category}</span>{#if item.year}<span>{item.year}</span>{/if}</div>
               <h2>{item.title}</h2>
               <p>{item.summary}</p>
-              {#if item.file}
-                <a href={item.file} target="_blank" rel="noreferrer">Open document ↗</a>
-              {:else if item.external_url}
-                <a href={item.external_url} target="_blank" rel="noreferrer">Open resource ↗</a>
-              {:else}
-                <span class="pending">Document publication pending</span>
-              {/if}
+              <a href={`/resources/${item.slug}`}>View resource ↗</a>
+              {#if !item.file && !item.external_url}<span class="pending">Document publication pending</span>{/if}
             </div>
           </article>
         {/each}
