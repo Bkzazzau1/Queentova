@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from .models import Campaign, NewsletterSubscriber, Program, VolunteerApplication
+from .models import Campaign, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -85,3 +85,20 @@ class PublicApiTests(TestCase):
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)
         self.assertEqual(NewsletterSubscriber.objects.count(), 1)
+
+
+    def test_support_request_requires_consent_and_contact(self):
+        response = self.client.post(
+            "/api/v1/request-support/",
+            {
+                "name": "Applicant",
+                "country": "Nigeria",
+                "assistance_type": "education",
+                "request_summary": "I need support to continue my education.",
+                "consent_to_contact": True,
+                "phone": "+2348000000000",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(SupportRequest.objects.count(), 1)
