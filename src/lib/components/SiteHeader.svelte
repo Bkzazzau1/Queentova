@@ -13,6 +13,8 @@
     { label: 'Founder', href: '/founder/jessie-ifeoma-udoka-menuba' },
     { label: 'Impact & Accountability', href: '/impact' },
     { label: 'Scholarships', href: '/scholarships' },
+    { label: 'Request Support', href: '/request-support' },
+    { label: 'Reports & Resources', href: '/resources' },
     { label: 'Gallery', href: '/gallery' },
     { label: 'Get Involved', href: '/get-involved' },
     { label: 'Contact', href: '/contact' }
