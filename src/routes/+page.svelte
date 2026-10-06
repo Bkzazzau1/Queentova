@@ -5,6 +5,7 @@
     content="Queen Tovah Cares Foundation International advances humanitarian support, education, youth empowerment and community development with a global outlook."
   />
   <meta property="og:title" content="Queen Tovah Cares Foundation International" />
+  <meta name="keywords" content="Queen Tovah Cares Foundation International, Jessie Ifeoma Udoka-Menuba, Jessie Udoka-Menuba, Princess Dr Jessie Joseph, Queen Tovah Foundation" />
   <meta
     property="og:description"
     content="Compassion with dignity. Opportunity with purpose. It is good to be good."
@@ -110,7 +111,11 @@
     <div class="about-copy">
       <p>
         Queen Tovah Cares Foundation International is a philanthropic foundation founded by
-        <strong>Princess Dr. Jessie Joseph</strong>. Its work is centred on people who are too often
+        <strong>Princess Dr. Jessie Joseph</strong>. Official public coverage of the Foundation also identifies
+        <strong>Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi)</strong> as Founder/CEO. Until the
+        Foundation formally confirms how these names should be presented together, the website keeps
+        the public-record name visible for discoverability without replacing the primary founder name
+        supplied for the site. Its work is centred on people who are too often
         overlooked: widows and widowers, indigent families, the homeless, young people and communities
         needing meaningful support.
       </p>
@@ -200,6 +205,7 @@
     <div class="founder-copy">
       <p class="eyebrow">Founder & vision</p>
       <h2 class="section-title">A conviction that goodness should travel.</h2>
+      <p class="public-name">Publicly reported as <a href="/founder/jessie-ifeoma-udoka-menuba">Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi)</a>, Founder/CEO of Queen-Tovah Cares Foundation International.</p>
       <p>
         Princess Dr. Jessie Joseph founded Queen Tovah Cares Foundation International with a vision of
         philanthropy that is not limited to one community or one country. The Foundation's outlook is
@@ -663,6 +669,17 @@
 
   .founder-copy .section-title {
     color: #2b1827;
+  }
+
+  .public-name {
+    margin: 18px 0 0;
+    color: #8e6020;
+    font-size: 0.88rem;
+  }
+
+  .public-name a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .founder-copy > p:not(.eyebrow):not(.strength) {
