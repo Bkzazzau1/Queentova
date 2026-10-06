@@ -105,7 +105,7 @@
 
       <button class="btn btn-primary" type="submit" disabled={busy}>{busy ? 'Submitting privately…' : 'Submit private request'}</button>
 
-      {#if feedback}<p class:success class="feedback" class:success={success} role="status">{feedback}</p>{/if}
+      {#if feedback}<p class="feedback" class:success={success} role="status">{feedback}</p>{/if}
       <small>At least one contact method — email or phone — is required for follow-up.</small>
     </form>
   </div>
