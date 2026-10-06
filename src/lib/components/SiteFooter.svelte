@@ -1,7 +1,7 @@
 <footer id="contact">
   <div class="container footer-grid">
     <div class="intro">
-      <div class="crest">QT</div>
+      <img class="footer-logo" src="/brand/queen-tovah-logo.webp" alt="Queen Tovah Cares Foundation International logo" />
       <h2>Queen Tovah Cares Foundation International</h2>
       <p>
         Compassion with dignity. Opportunity with purpose. A global outlook rooted in service to
@@ -11,10 +11,10 @@
 
     <div class="links">
       <p class="label">Explore</p>
-      <a href="#about">About the Foundation</a>
-      <a href="#programs">Our Programs</a>
-      <a href="#founder">Founder</a>
-      <a href="#impact">Our Approach</a>
+      <a href="/about">About the Foundation</a>
+      <a href="/programs">Our Programs</a>
+      <a href="/about#founder">Founder</a>
+      <a href="/impact">Our Approach</a>
     </div>
 
     <div class="links">
@@ -48,16 +48,11 @@
     gap: 54px;
   }
 
-  .crest {
-    display: grid;
-    width: 54px;
-    height: 54px;
-    place-items: center;
-    border: 1px solid rgba(225, 189, 106, 0.48);
-    border-radius: 50%;
-    color: var(--gold-bright);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-weight: 700;
+  .footer-logo {
+    width: 128px;
+    border: 1px solid rgba(225, 189, 106, 0.24);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
   }
 
   h2 {
