@@ -14,6 +14,7 @@ const staticRoutes = [
   '/scholarships',
   '/request-support',
   '/resources',
+  '/media',
   '/faq',
   '/gallery',
   '/get-involved',
