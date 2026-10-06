@@ -3,9 +3,9 @@
   import SiteHeader from '$lib/components/SiteHeader.svelte';
   import SiteFooter from '$lib/components/SiteFooter.svelte';
 
-  let { children } = $props();
+  let { children, data } = $props();
 </script>
 
 <SiteHeader />
 <main>{@render children()}</main>
-<SiteFooter />
+<SiteFooter profile={data.siteProfile} />
