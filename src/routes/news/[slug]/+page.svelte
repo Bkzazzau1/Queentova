@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
   const { story } = data;
@@ -6,6 +7,26 @@
   const eventDate = story.event_date
     ? new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(story.event_date))
     : '';
+
+  const articleSchema = $derived(
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: story.title,
+      description: story.excerpt,
+      url: `${page.url.origin}${page.url.pathname}`,
+      ...(story.hero_image ? { image: story.hero_image } : {}),
+      ...(story.published_at ? { datePublished: story.published_at } : {}),
+      publisher: {
+        '@type': 'NGO',
+        name: 'Queen Tovah Cares Foundation International',
+        logo: {
+          '@type': 'ImageObject',
+          url: `${page.url.origin}/brand/queen-tovah-logo.webp`
+        }
+      }
+    }).replace(/</g, '\\u003c')
+  );
 </script>
 
 <svelte:head>
@@ -15,6 +36,8 @@
   <meta property="og:title" content={story.seo_title || story.title} />
   <meta property="og:description" content={story.seo_description || story.excerpt} />
   {#if story.hero_image}<meta property="og:image" content={story.hero_image} />{/if}
+  <meta property="og:type" content="article" />
+  {@html `<script type="application/ld+json">${articleSchema}</script>`}
 </svelte:head>
 
 <PageHero
