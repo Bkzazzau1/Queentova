@@ -193,6 +193,123 @@ class Partner(PublishableModel):
         return self.title
 
 
+class Campaign(PublishableModel):
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    image = models.ImageField(upload_to="campaigns/%Y/%m/", blank=True, null=True)
+    image_alt = models.CharField(max_length=220, blank=True)
+    goal_amount = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
+    current_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    currency = models.CharField(max_length=8, default="USD")
+    starts_at = models.DateTimeField(blank=True, null=True)
+    ends_at = models.DateTimeField(blank=True, null=True)
+    featured = models.BooleanField(default=False)
+    accepting_support = models.BooleanField(default=False)
+    cta_label = models.CharField(max_length=80, default="Support this cause")
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-published_at", "title"]
+
+    def __str__(self):
+        return self.title
+
+
+class Event(PublishableModel):
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    starts_at = models.DateTimeField(db_index=True)
+    ends_at = models.DateTimeField(blank=True, null=True)
+    venue_name = models.CharField(max_length=180, blank=True)
+    address = models.CharField(max_length=260, blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    online_url = models.URLField(blank=True)
+    registration_url = models.URLField(blank=True)
+    image = models.ImageField(upload_to="events/%Y/%m/", blank=True, null=True)
+    image_alt = models.CharField(max_length=220, blank=True)
+    featured = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["starts_at", "title"]
+
+    def __str__(self):
+        return self.title
+
+
+class SiteProfile(PublishableModel):
+    slug = models.SlugField(max_length=80, unique=True, default="primary")
+    display_name = models.CharField(max_length=220, default="Queen Tovah Cares Foundation International")
+    short_description = models.TextField(blank=True)
+    contact_email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=60, blank=True)
+    whatsapp = models.CharField(max_length=60, blank=True)
+    office_address = models.TextField(blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    facebook_url = models.URLField(blank=True)
+    instagram_url = models.URLField(blank=True)
+    x_url = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
+    youtube_url = models.URLField(blank=True)
+    donation_url = models.URLField(blank=True)
+    volunteer_enabled = models.BooleanField(default=True)
+    newsletter_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Site profile"
+        verbose_name_plural = "Site profile"
+
+    def __str__(self):
+        return self.display_name
+
+
+class VolunteerApplication(models.Model):
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        REVIEWING = "reviewing", "Reviewing"
+        ACCEPTED = "accepted", "Accepted"
+        DECLINED = "declined", "Declined"
+
+    name = models.CharField(max_length=180)
+    email = models.EmailField()
+    phone = models.CharField(max_length=60, blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    areas_of_interest = models.CharField(max_length=260)
+    skills = models.TextField(blank=True)
+    availability = models.CharField(max_length=180, blank=True)
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.NEW, db_index=True)
+    internal_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} — volunteer"
+
+
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=160, blank=True)
+    active = models.BooleanField(default=True, db_index=True)
+    source = models.CharField(max_length=80, default="website")
+    consent_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-consent_at"]
+
+    def __str__(self):
+        return self.email
+
+
 class ContactSubmission(models.Model):
     class Status(models.TextChoices):
         NEW = "new", "New"
