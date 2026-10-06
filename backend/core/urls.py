@@ -2,9 +2,11 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    AnnouncementViewSet,
     CampaignViewSet,
     ContactSubmissionCreateView,
     EventViewSet,
+    FAQViewSet,
     FounderAchievementViewSet,
     FounderProfileViewSet,
     GalleryItemViewSet,
@@ -22,6 +24,8 @@ from .views import (
 )
 
 router = DefaultRouter()
+router.register("announcements", AnnouncementViewSet, basename="announcement")
+router.register("faqs", FAQViewSet, basename="faq")
 router.register("programs", ProgramViewSet, basename="program")
 router.register("stories", StoryViewSet, basename="story")
 router.register("gallery", GalleryItemViewSet, basename="gallery")
