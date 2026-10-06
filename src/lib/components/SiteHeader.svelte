@@ -35,6 +35,7 @@
     { label: 'Scholarships', href: '/scholarships' },
     { label: 'Request Support', href: '/request-support' },
     { label: 'Reports & Resources', href: '/resources' },
+    { label: 'Press & Media', href: '/media' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Gallery', href: '/gallery' },
     { label: 'Get Involved', href: '/get-involved' },
