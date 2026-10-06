@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq';
   title: string;
   excerpt: string;
   url: string;
@@ -298,4 +298,29 @@ export async function submitSupportRequest(payload: SupportRequestPayload): Prom
     body: JSON.stringify(payload)
   });
   if (!response.ok) throw new Error('Unable to submit support request.');
+}
+
+
+export interface Announcement {
+  title: string;
+  slug: string;
+  message: string;
+  kind: 'info' | 'event' | 'opportunity' | 'appeal' | 'urgent';
+  link_label: string;
+  link_url: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  dismissible: boolean;
+  priority: number;
+  published_at: string | null;
+}
+
+export interface FAQItem {
+  question: string;
+  slug: string;
+  answer: string;
+  category: 'general' | 'support' | 'giving' | 'scholarship' | 'volunteer' | 'partnership';
+  featured: boolean;
+  display_order: number;
+  published_at: string | null;
 }
