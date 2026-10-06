@@ -2,15 +2,21 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    CampaignViewSet,
     ContactSubmissionCreateView,
+    EventViewSet,
     FounderAchievementViewSet,
     FounderProfileViewSet,
     GalleryItemViewSet,
     ImpactMetricViewSet,
+    NewsletterSubscribeView,
     PartnerViewSet,
     ProgramViewSet,
     ScholarshipViewSet,
+    SearchView,
+    SiteProfileViewSet,
     StoryViewSet,
+    VolunteerApplicationCreateView,
 )
 
 router = DefaultRouter()
@@ -22,8 +28,14 @@ router.register("founder-achievements", FounderAchievementViewSet, basename="fou
 router.register("impact", ImpactMetricViewSet, basename="impact")
 router.register("scholarships", ScholarshipViewSet, basename="scholarship")
 router.register("partners", PartnerViewSet, basename="partner")
+router.register("campaigns", CampaignViewSet, basename="campaign")
+router.register("events", EventViewSet, basename="event")
+router.register("site-profile", SiteProfileViewSet, basename="site-profile")
 
 urlpatterns = [
     path("", include(router.urls)),
     path("contact/", ContactSubmissionCreateView.as_view(), name="contact-create"),
+    path("volunteer/", VolunteerApplicationCreateView.as_view(), name="volunteer-create"),
+    path("newsletter/", NewsletterSubscribeView.as_view(), name="newsletter-subscribe"),
+    path("search/", SearchView.as_view(), name="site-search"),
 ]
