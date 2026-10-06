@@ -15,9 +15,11 @@ from .models import (
     Partner,
     Program,
     PublishableModel,
+    Resource,
     Scholarship,
     SiteProfile,
     Story,
+    SupportRequest,
     VolunteerApplication,
 )
 from .serializers import (
@@ -31,9 +33,11 @@ from .serializers import (
     NewsletterSubscriberSerializer,
     PartnerSerializer,
     ProgramSerializer,
+    ResourceSerializer,
     ScholarshipSerializer,
     SiteProfileSerializer,
     StorySerializer,
+    SupportRequestSerializer,
     VolunteerApplicationSerializer,
 )
 
@@ -202,3 +206,17 @@ class SearchView(APIView):
             })
 
         return Response({"query": query, "results": results[:24]})
+
+
+class ResourceViewSet(PublishedReadOnlyViewSet):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    search_fields = ["title", "summary", "category"]
+    ordering_fields = ["display_order", "year", "published_at", "title"]
+
+
+class SupportRequestCreateView(generics.CreateAPIView):
+    queryset = SupportRequest.objects.all()
+    serializer_class = SupportRequestSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "support_request"
