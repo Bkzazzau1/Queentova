@@ -2,18 +2,19 @@
   let open = false;
 
   const links = [
-    { label: 'About', href: '#about' },
-    { label: 'Programs', href: '#programs' },
-    { label: 'Impact', href: '#impact' },
-    { label: 'Founder', href: '#founder' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'About', href: '/about' },
+    { label: 'Programs', href: '/programs' },
+    { label: 'Impact', href: '/impact' },
+    { label: 'Stories', href: '/news' },
+    { label: 'Gallery', href: '/gallery' },
+    { label: 'Contact', href: '/contact' }
   ];
 </script>
 
 <header class="site-header">
   <div class="container nav">
     <a class="brand" href="/" aria-label="Queen Tovah Cares Foundation International home">
-      <span class="brand-mark">QT</span>
+      <img class="brand-logo" src="/brand/queen-tovah-logo.webp" alt="" />
       <span class="brand-copy">
         <strong>Queen Tovah</strong>
         <small>Cares Foundation International</small>
@@ -24,7 +25,7 @@
       {#each links as link}
         <a href={link.href} onclick={() => (open = false)}>{link.label}</a>
       {/each}
-      <a class="donate" href="#contact" onclick={() => (open = false)}>Support the mission</a>
+      <a class="donate" href="/donate" onclick={() => (open = false)}>Support the mission</a>
     </nav>
 
     <button
@@ -65,21 +66,13 @@
     min-width: 0;
   }
 
-  .brand-mark {
-    display: grid;
-    width: 44px;
+  .brand-logo {
+    width: 58px;
     height: 44px;
-    place-items: center;
-    border: 1px solid rgba(225, 189, 106, 0.54);
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.18), transparent 24%),
-      linear-gradient(145deg, #6d1a76, #2b0d2f);
-    color: var(--gold-bright);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    box-shadow: inset 0 0 0 3px rgba(201, 151, 63, 0.08);
+    border: 1px solid rgba(225, 189, 106, 0.28);
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
   }
 
   .brand-copy {
