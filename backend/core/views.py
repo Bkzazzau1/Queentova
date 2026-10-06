@@ -202,3 +202,98 @@ class SearchView(APIView):
             })
 
         return Response({"query": query, "results": results[:24]})
+
+
+class CampaignViewSet(PublishedReadOnlyViewSet):
+    queryset = Campaign.objects.all()
+    serializer_class = CampaignSerializer
+    search_fields = ["title", "summary", "body"]
+    ordering_fields = ["display_order", "ends_at", "published_at", "title"]
+
+
+class EventViewSet(PublishedReadOnlyViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    search_fields = ["title", "summary", "body", "venue_name", "city", "country"]
+    ordering_fields = ["starts_at", "published_at", "title"]
+
+
+class SiteProfileViewSet(PublishedReadOnlyViewSet):
+    queryset = SiteProfile.objects.all()
+    serializer_class = SiteProfileSerializer
+    search_fields = ["display_name", "short_description"]
+
+
+class VolunteerApplicationCreateView(generics.CreateAPIView):
+    queryset = VolunteerApplication.objects.all()
+    serializer_class = VolunteerApplicationSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "volunteer"
+
+
+class NewsletterSubscribeView(generics.CreateAPIView):
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "newsletter"
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response(
+            {"status": "subscribed", "email": response.data.get("email")},
+            status=status.HTTP_200_OK,
+        )
+
+
+class SearchView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        query = request.query_params.get("q", "").strip()
+        if len(query) < 2:
+            return Response({"query": query, "results": []})
+
+        published = PublishableModel.PublicationStatus.PUBLISHED
+        results = []
+
+        for item in Program.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "program",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/programs/{item.slug}",
+            })
+
+        for item in Story.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(excerpt__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "story",
+                "title": item.title,
+                "excerpt": item.excerpt,
+                "url": f"/news/{item.slug}",
+            })
+
+        for item in Campaign.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "campaign",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/causes/{item.slug}",
+            })
+
+        for item in Event.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "event",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/events/{item.slug}",
+            })
+
+        return Response({"query": query, "results": results[:24]})
