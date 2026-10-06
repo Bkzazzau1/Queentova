@@ -13,7 +13,9 @@
 </svelte:head>
 
 <script lang="ts">
-  const programs = [
+  let { data } = $props();
+
+  const fallbackPrograms = [
     {
       number: '01',
       title: 'Humanitarian Support',
@@ -39,6 +41,15 @@
       icon: 'people'
     }
   ];
+
+  const programs = data.programs.length
+    ? data.programs.slice(0, 4).map((program, index) => ({
+        number: String(index + 1).padStart(2, '0'),
+        title: program.title,
+        copy: program.summary,
+        icon: program.icon || 'people'
+      }))
+    : fallbackPrograms;
 
   const principles = [
     ['Global outlook', 'Service is not confined by geography; compassion should reach wherever it is genuinely needed.'],
