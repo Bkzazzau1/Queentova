@@ -241,3 +241,25 @@ export async function searchSite(fetcher: Fetcher, query: string): Promise<Searc
     return [];
   }
 }
+
+
+export interface Scholarship {
+  title: string;
+  slug: string;
+  summary: string;
+  eligibility: string;
+  application_status: 'upcoming' | 'open' | 'closed';
+  opens_at: string | null;
+  closes_at: string | null;
+  application_url: string;
+  published_at: string | null;
+}
+
+export interface Partner {
+  title: string;
+  slug: string;
+  description: string;
+  website: string;
+  logo: string | null;
+  published_at: string | null;
+}
