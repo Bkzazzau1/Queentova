@@ -19,8 +19,8 @@
 
     <div class="links">
       <p class="label">Connect</p>
-      <a href="mailto:info@queentovah.org">info@queentovah.org</a>
-      <span>Partnerships & humanitarian enquiries</span>
+      <a href="/contact">Contact the Foundation</a>
+      <a href="/donate">Partnerships & support</a>
       <span>Scholarships & community programs</span>
     </div>
   </div>
