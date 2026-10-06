@@ -6,6 +6,8 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
 
+  let { data } = $props();
+
   const steps = [
     ['Listen','Understand the person, family or community need before deciding what support should look like.'],
     ['Respond','Match assistance to the situation with dignity, practicality and compassion.'],
@@ -21,15 +23,29 @@
   copy="We are building an impact model that values both immediate relief and the longer journey toward dignity, opportunity and stronger communities."
 />
 
+{#if data.metrics.length}
+  <section class="metrics">
+    <div class="container metric-grid">
+      {#each data.metrics as metric}
+        <article>
+          <strong>{metric.value}{metric.unit ? ` ${metric.unit}` : ''}</strong>
+          <h2>{metric.title}</h2>
+          {#if metric.period}<span>{metric.period}</span>{/if}
+          <p>{metric.verification_note}</p>
+        </article>
+      {/each}
+    </div>
+  </section>
+{/if}
+
 <section class="approach">
   <div class="container approach-grid">
     <div>
       <p class="eyebrow">Our approach</p>
       <h2 class="section-title">Care that is responsible, not performative.</h2>
       <p class="section-copy">
-        We do not publish invented impact numbers. Verified program results, beneficiary counts and
-        documented outcomes will be added as the Foundation's reporting records are prepared for the
-        website.
+        We do not publish invented impact numbers. Only metrics approved through the Foundation admin
+        and accompanied by a verification note can appear in the public impact section.
       </p>
     </div>
     <div class="steps">
@@ -52,6 +68,13 @@
 </section>
 
 <style>
+  .metrics{padding:86px 0;background:var(--ivory);color:#2b1827}
+  .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .metric-grid article{border:1px solid rgba(80,45,70,.13);border-radius:24px;padding:28px;background:#fff}
+  .metric-grid strong{display:block;color:#8e6020;font:600 3rem/1 'Cormorant Garamond',Georgia,serif}
+  .metric-grid h2{margin:16px 0 2px;color:#43213f;font:600 1.55rem/1 'Cormorant Garamond',Georgia,serif}
+  .metric-grid span{color:#9a887f;font-size:.75rem}
+  .metric-grid p{color:#6d5b68;font-size:.86rem}
   .approach{padding:112px 0;background:#100711}
   .approach-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:84px}
   .steps{border-top:1px solid var(--line)}
@@ -65,5 +88,5 @@
   .account-grid article{border:1px solid rgba(80,45,70,.13);border-radius:24px;padding:30px;background:rgba(255,255,255,.44)}
   .account-grid h3{margin:0;color:#44233f;font:600 1.7rem/1 'Cormorant Garamond',Georgia,serif}
   .account-grid p{margin:14px 0 0;color:#6c5a67}
-  @media(max-width:850px){.approach-grid{grid-template-columns:1fr;gap:48px}.account-grid{grid-template-columns:1fr}}
+  @media(max-width:850px){.approach-grid{grid-template-columns:1fr;gap:48px}.account-grid,.metric-grid{grid-template-columns:1fr}}
 </style>
