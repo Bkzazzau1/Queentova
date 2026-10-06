@@ -1,12 +1,15 @@
 from django.db.models import Q
+from django.utils import timezone
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import (
+    Announcement,
     Campaign,
     ContactSubmission,
     Event,
+    FAQ,
     FounderAchievement,
     FounderProfile,
     GalleryItem,
@@ -23,9 +26,11 @@ from .models import (
     VolunteerApplication,
 )
 from .serializers import (
+    AnnouncementSerializer,
     CampaignSerializer,
     ContactSubmissionSerializer,
     EventSerializer,
+    FAQSerializer,
     FounderAchievementSerializer,
     FounderProfileSerializer,
     GalleryItemSerializer,
@@ -205,6 +210,16 @@ class SearchView(APIView):
                 "url": f"/events/{item.slug}",
             })
 
+        for item in FAQ.objects.filter(status=published).filter(
+            Q(question__icontains=query) | Q(answer__icontains=query) | Q(category__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "faq",
+                "title": item.question,
+                "excerpt": item.answer[:220],
+                "url": f"/faq#{item.slug}",
+            })
+
         for item in Resource.objects.filter(status=published).filter(
             Q(title__icontains=query) | Q(summary__icontains=query) | Q(category__icontains=query)
         )[:8]:
@@ -216,6 +231,29 @@ class SearchView(APIView):
             })
 
         return Response({"query": query, "results": results[:24]})
+
+
+class AnnouncementViewSet(PublishedReadOnlyViewSet):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+    search_fields = ["title", "message", "kind"]
+    ordering_fields = ["priority", "published_at", "title"]
+
+    def get_queryset(self):
+        now = timezone.now()
+        return (
+            super()
+            .get_queryset()
+            .filter(Q(starts_at__isnull=True) | Q(starts_at__lte=now))
+            .filter(Q(ends_at__isnull=True) | Q(ends_at__gte=now))
+        )
+
+
+class FAQViewSet(PublishedReadOnlyViewSet):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    search_fields = ["question", "answer", "category"]
+    ordering_fields = ["display_order", "category", "question"]
 
 
 class ResourceViewSet(PublishedReadOnlyViewSet):
