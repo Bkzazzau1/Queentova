@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Campaign, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, FAQ, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -102,3 +105,53 @@ class PublicApiTests(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(SupportRequest.objects.count(), 1)
+
+
+    def test_faq_api_exposes_only_published_questions(self):
+        FAQ.objects.create(
+            question="Published question?",
+            slug="published-question",
+            answer="Published answer.",
+            status="published",
+        )
+        FAQ.objects.create(
+            question="Draft question?",
+            slug="draft-question",
+            answer="Draft answer.",
+            status="draft",
+        )
+        response = self.client.get("/api/v1/faqs/")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertIn("published-question", slugs)
+        self.assertNotIn("draft-question", slugs)
+
+    def test_announcement_api_hides_expired_and_future_items(self):
+        now = timezone.now()
+        Announcement.objects.create(
+            title="Active",
+            slug="active-announcement",
+            message="Visible now",
+            starts_at=now - timedelta(hours=1),
+            ends_at=now + timedelta(hours=1),
+            priority=10,
+            status="published",
+        )
+        Announcement.objects.create(
+            title="Expired",
+            slug="expired-announcement",
+            message="No longer visible",
+            ends_at=now - timedelta(minutes=1),
+            status="published",
+        )
+        Announcement.objects.create(
+            title="Future",
+            slug="future-announcement",
+            message="Not yet visible",
+            starts_at=now + timedelta(hours=1),
+            status="published",
+        )
+        response = self.client.get("/api/v1/announcements/")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertEqual(slugs, ["active-announcement"])
