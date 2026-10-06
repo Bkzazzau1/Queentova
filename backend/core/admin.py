@@ -2,15 +2,20 @@ from django.contrib import admin
 from django.utils import timezone
 
 from .models import (
+    Campaign,
     ContactSubmission,
+    Event,
     FounderAchievement,
     FounderProfile,
     GalleryItem,
     ImpactMetric,
+    NewsletterSubscriber,
     Partner,
     Program,
     Scholarship,
+    SiteProfile,
     Story,
+    VolunteerApplication,
 )
 
 
@@ -95,6 +100,47 @@ class PartnerAdmin(PublishWorkflowAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 
+@admin.register(Campaign)
+class CampaignAdmin(PublishWorkflowAdmin):
+    list_display = ("title", "status", "featured", "accepting_support", "current_amount", "goal_amount", "currency")
+    list_filter = ("status", "featured", "accepting_support", "currency")
+    search_fields = ("title", "summary", "body")
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(Event)
+class EventAdmin(PublishWorkflowAdmin):
+    list_display = ("title", "starts_at", "city", "country", "status", "featured")
+    list_filter = ("status", "featured", "country")
+    search_fields = ("title", "summary", "body", "venue_name", "city", "country")
+    prepopulated_fields = {"slug": ("title",)}
+    date_hierarchy = "starts_at"
+
+
+@admin.register(SiteProfile)
+class SiteProfileAdmin(PublishWorkflowAdmin):
+    list_display = ("display_name", "contact_email", "phone", "status", "updated_at")
+    search_fields = ("display_name", "contact_email", "phone", "office_address")
+
+
+@admin.register(VolunteerApplication)
+class VolunteerApplicationAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "country", "areas_of_interest", "status", "created_at")
+    list_filter = ("status", "country", "created_at")
+    search_fields = ("name", "email", "phone", "areas_of_interest", "skills", "message")
+    readonly_fields = ("name", "email", "phone", "country", "city", "areas_of_interest", "skills", "availability", "message", "created_at", "updated_at")
+    ordering = ("-created_at",)
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ("email", "name", "active", "source", "consent_at")
+    list_filter = ("active", "source", "consent_at")
+    search_fields = ("email", "name")
+    readonly_fields = ("consent_at", "updated_at")
+    ordering = ("-consent_at",)
+
+
 @admin.register(ContactSubmission)
 class ContactSubmissionAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "enquiry_type", "status", "created_at")
@@ -106,4 +152,4 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
 
 admin.site.site_header = "Queen Tovah Foundation Administration"
 admin.site.site_title = "Queen Tovah Admin"
-admin.site.index_title = "Content, programs and enquiries"
+admin.site.index_title = "Content, programs and engagement"
