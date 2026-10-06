@@ -150,6 +150,7 @@ class NewsletterSubscriberSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewsletterSubscriber
         fields = ["email", "name"]
+        extra_kwargs = {"email": {"validators": []}}
 
     def create(self, validated_data):
         subscriber, _created = NewsletterSubscriber.objects.update_or_create(
