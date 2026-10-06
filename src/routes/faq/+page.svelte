@@ -4,6 +4,9 @@
     name="description"
     content="Answers to common questions about Queen Tovah Cares Foundation International, giving, humanitarian support, scholarships, volunteering and partnerships."
   />
+  {#if data.faqs.length}
+    {@html `<script type="application/ld+json">${faqSchema}</script>`}
+  {/if}
 </svelte:head>
 
 <script lang="ts">
@@ -11,6 +14,21 @@
 
   let { data } = $props();
   let category = 'all';
+
+  const faqSchema = $derived(
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: data.faqs.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer
+        }
+      }))
+    }).replace(/</g, '\\u003c')
+  );
 
   const categories = [
     ['all', 'All questions'],
