@@ -8,6 +8,7 @@ const staticRoutes = [
   '/programs',
   '/causes',
   '/impact',
+  '/governance',
   '/news',
   '/events',
   '/scholarships',
