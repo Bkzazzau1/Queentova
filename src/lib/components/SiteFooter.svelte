@@ -49,6 +49,7 @@
       <a href="/programs">Our Programs</a>
       <a href="/causes">Causes</a>
       <a href="/impact">Impact & Accountability</a>
+      <a href="/governance">Governance & Transparency</a>
       <a href="/news">Stories</a>
       <a href="/gallery">Gallery</a>
     </div>
