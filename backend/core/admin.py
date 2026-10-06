@@ -2,9 +2,11 @@ from django.contrib import admin
 from django.utils import timezone
 
 from .models import (
+    Announcement,
     Campaign,
     ContactSubmission,
     Event,
+    FAQ,
     FounderAchievement,
     FounderProfile,
     GalleryItem,
@@ -150,6 +152,22 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
     search_fields = ("name", "email", "message")
     readonly_fields = ("name", "email", "enquiry_type", "message", "created_at", "updated_at")
     ordering = ("-created_at",)
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(PublishWorkflowAdmin):
+    list_display = ("title", "kind", "priority", "starts_at", "ends_at", "status")
+    list_filter = ("status", "kind", "dismissible")
+    search_fields = ("title", "message")
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(FAQ)
+class FAQAdmin(PublishWorkflowAdmin):
+    list_display = ("question", "category", "featured", "display_order", "status")
+    list_filter = ("status", "category", "featured")
+    search_fields = ("question", "answer")
+    prepopulated_fields = {"slug": ("question",)}
 
 
 @admin.register(Resource)
