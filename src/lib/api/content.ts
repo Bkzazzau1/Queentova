@@ -129,3 +129,115 @@ export async function submitContact(payload: ContactPayload): Promise<void> {
     throw new Error('Unable to submit your message.');
   }
 }
+
+
+export interface Campaign {
+  title: string;
+  slug: string;
+  summary: string;
+  body: string;
+  image: string | null;
+  image_alt: string;
+  goal_amount: string | null;
+  current_amount: string;
+  currency: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  featured: boolean;
+  accepting_support: boolean;
+  cta_label: string;
+  progress_percent: number | null;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+}
+
+export interface EventItem {
+  title: string;
+  slug: string;
+  summary: string;
+  body: string;
+  starts_at: string;
+  ends_at: string | null;
+  venue_name: string;
+  address: string;
+  city: string;
+  country: string;
+  online_url: string;
+  registration_url: string;
+  image: string | null;
+  image_alt: string;
+  featured: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+}
+
+export interface SiteProfile {
+  slug: string;
+  display_name: string;
+  short_description: string;
+  contact_email: string;
+  phone: string;
+  whatsapp: string;
+  office_address: string;
+  country: string;
+  facebook_url: string;
+  instagram_url: string;
+  x_url: string;
+  linkedin_url: string;
+  youtube_url: string;
+  donation_url: string;
+  volunteer_enabled: boolean;
+  newsletter_enabled: boolean;
+}
+
+export interface VolunteerPayload {
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  city: string;
+  areas_of_interest: string;
+  skills: string;
+  availability: string;
+  message: string;
+}
+
+export interface SearchResult {
+  type: 'program' | 'story' | 'campaign' | 'event';
+  title: string;
+  excerpt: string;
+  url: string;
+}
+
+export async function submitVolunteer(payload: VolunteerPayload): Promise<void> {
+  const response = await fetch(`${baseUrl()}/volunteer/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) throw new Error('Unable to submit volunteer application.');
+}
+
+export async function subscribeNewsletter(email: string, name = ''): Promise<void> {
+  const response = await fetch(`${baseUrl()}/newsletter/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name })
+  });
+  if (!response.ok) throw new Error('Unable to subscribe.');
+}
+
+export async function searchSite(fetcher: Fetcher, query: string): Promise<SearchResult[]> {
+  const value = query.trim();
+  if (value.length < 2) return [];
+  try {
+    const response = await fetcher(`${baseUrl()}/search/?q=${encodeURIComponent(value)}`);
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.results ?? [];
+  } catch {
+    return [];
+  }
+}
