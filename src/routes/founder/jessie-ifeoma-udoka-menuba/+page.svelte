@@ -18,7 +18,9 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
 
-  const achievements = [
+  let { data } = $props();
+
+  const fallbackAchievements = [
     {
       year: '2024',
       title: 'Mother General Award',
@@ -55,6 +57,18 @@
       href: 'https://anambrastate.gov.ng/tag/a-shining-light-princess-jessie-udoka-menuba-honoured-with-ada-di-iche-1-worldwide-award/'
     }
   ];
+
+  const achievements = data.achievements.length
+    ? data.achievements.map((achievement) => ({
+        year: String(achievement.year ?? ''),
+        title: achievement.title,
+        copy: achievement.description,
+        source: achievement.source_name || 'Source',
+        href: achievement.source_url
+      }))
+    : fallbackAchievements;
+
+  const founder = data.founder;
 
   const education = [
     'BSc in Nursing',
@@ -94,9 +108,13 @@
   <div class="container profile-grid">
     <aside class="portrait-card">
       <div class="portrait-frame">
-        <span class="crown">♛</span>
-        <strong>Princess Dr. Jessie Ifeoma Udoka-Menuba</strong>
-        <small>Founder / CEO — public record</small>
+        {#if founder?.portrait}
+          <img src={founder.portrait} alt={founder.portrait_alt || founder.public_record_name || founder.primary_name} />
+        {:else}
+          <span class="crown">♛</span>
+          <strong>{founder?.public_record_name || 'Princess Dr. Jessie Ifeoma Udoka-Menuba'}</strong>
+          <small>{founder?.headline || 'Founder / CEO — public record'}</small>
+        {/if}
       </div>
       <p>
         Official coverage contains photographs of Dr. Udoka-Menuba. A Foundation-approved portrait will
@@ -114,17 +132,14 @@
       <p class="eyebrow">Humanitarian profile</p>
       <h2 class="section-title">A public record centred on service, philanthropy and community development.</h2>
       <p>
-        Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi) is repeatedly described in official public
-        reporting as the Founder and CEO of Queen-Tovah Cares Foundation International. Her work has been
-        associated with support for widows, vulnerable children, indigent people, older people and
-        communities, alongside education, scholarships, youth initiatives and humanitarian assistance.
+        {founder?.biography || 'Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi) is repeatedly described in official public reporting as the Founder and CEO of Queen-Tovah Cares Foundation International. Her work has been associated with support for widows, vulnerable children, indigent people, older people and communities, alongside education, scholarships, youth initiatives and humanitarian assistance.'}
       </p>
       <p>
         Anambra State Government coverage describes the Foundation as having a global outlook and as
         non-political in its humanitarian mission. Independent reporting has also documented her support
         for youth development through the 2025 Amawbia August League football tournament.
       </p>
-      <blockquote>“It is good to be good.”</blockquote>
+      <blockquote>“{founder?.motto || 'It is good to be good.'}”</blockquote>
     </div>
   </div>
 </section>
@@ -211,6 +226,7 @@
   .portrait-card { border-radius:30px; padding:28px; background:linear-gradient(145deg,#4b1551,#100611); box-shadow:0 30px 80px rgba(53,28,46,.18); }
   .portrait-frame { min-height:500px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; position:relative; border:1px solid rgba(225,189,106,.35); border-radius:46% 46% 22px 22px; padding:30px; text-align:center; }
   .portrait-frame .crown { position:absolute; top:42px; color:var(--gold-bright); font-size:3.5rem; }
+  .portrait-frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
   .portrait-frame strong { max-width:270px; margin-top:48px; color:var(--champagne); font:600 2rem/1.05 'Cormorant Garamond',Georgia,serif; }
   .portrait-frame small { color:#aa96a8; }
   .portrait-card>p { color:#c5b5c3; font-size:.82rem; }
