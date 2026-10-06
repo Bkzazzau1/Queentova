@@ -205,6 +205,16 @@ class SearchView(APIView):
                 "url": f"/events/{item.slug}",
             })
 
+        for item in Resource.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(category__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "resource",
+                "title": item.title,
+                "excerpt": item.summary or item.get_category_display(),
+                "url": "/resources",
+            })
+
         return Response({"query": query, "results": results[:24]})
 
 
