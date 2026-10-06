@@ -1,5 +1,24 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import type { Announcement } from '$lib/api/content';
+
+  let { announcement = null }: { announcement?: Announcement | null } = $props();
   let open = false;
+  let announcementVisible = true;
+
+  onMount(() => {
+    if (announcement?.dismissible) {
+      announcementVisible = sessionStorage.getItem(`qt-announcement:${announcement.slug}`) !== 'dismissed';
+    }
+  });
+
+  function dismissAnnouncement() {
+    if (!announcement) return;
+    announcementVisible = false;
+    if (announcement.dismissible) {
+      sessionStorage.setItem(`qt-announcement:${announcement.slug}`, 'dismissed');
+    }
+  }
 
   const links = [
     { label: 'About', href: '/about' },
@@ -22,6 +41,26 @@
 </script>
 
 <header class="site-header">
+  {#if announcement && announcementVisible}
+    <div class="announcement" class:urgent={announcement.kind === 'urgent'} class:appeal={announcement.kind === 'appeal'}>
+      <div class="container announcement-inner">
+        <div class="announcement-copy">
+          <span>{announcement.kind}</span>
+          <strong>{announcement.title}</strong>
+          <p>{announcement.message}</p>
+        </div>
+        <div class="announcement-actions">
+          {#if announcement.link_url}
+            <a href={announcement.link_url}>{announcement.link_label || 'Learn more'} ↗</a>
+          {/if}
+          {#if announcement.dismissible}
+            <button type="button" aria-label="Dismiss announcement" onclick={dismissAnnouncement}>×</button>
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <div class="container nav">
     <a class="brand" href="/" aria-label="Queen Tovah Cares Foundation International home">
       <img class="brand-logo" src="/brand/queen-tovah-logo.webp" alt="" />
@@ -73,6 +112,87 @@
     border-bottom: 1px solid rgba(225, 189, 106, 0.12);
     background: rgba(5, 2, 4, 0.76);
     backdrop-filter: blur(20px);
+  }
+
+  .announcement {
+    border-bottom: 1px solid rgba(225, 189, 106, 0.15);
+    background: linear-gradient(90deg, rgba(76,21,83,.94), rgba(31,8,33,.96));
+  }
+
+  .announcement.appeal {
+    background: linear-gradient(90deg, rgba(89,47,18,.94), rgba(39,18,9,.96));
+  }
+
+  .announcement.urgent {
+    background: linear-gradient(90deg, rgba(98,30,35,.96), rgba(45,12,17,.97));
+  }
+
+  .announcement-inner {
+    min-height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-block: 7px;
+  }
+
+  .announcement-copy {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .announcement-copy > span {
+    flex-shrink: 0;
+    border: 1px solid rgba(225,189,106,.3);
+    border-radius: 999px;
+    padding: 3px 7px;
+    color: var(--gold-bright);
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .announcement-copy strong {
+    flex-shrink: 0;
+    color: var(--champagne);
+    font-size: .78rem;
+  }
+
+  .announcement-copy p {
+    overflow: hidden;
+    margin: 0;
+    color: #cbbdca;
+    font-size: .76rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .announcement-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .announcement-actions a {
+    color: var(--gold-bright);
+    font-size: .72rem;
+    font-weight: 700;
+  }
+
+  .announcement-actions button {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+    color: #d8ccd7;
+    cursor: pointer;
+    font-size: 1rem;
   }
 
   .nav {
@@ -243,6 +363,14 @@
   }
 
   @media (max-width: 1060px) {
+    .announcement-copy strong {
+      display: none;
+    }
+
+    .announcement-copy p {
+      max-width: 58vw;
+    }
+
     .mobile-actions {
       display: flex;
     }
@@ -302,6 +430,18 @@
   }
 
   @media (max-width: 480px) {
+    .announcement-copy > span {
+      display: none;
+    }
+
+    .announcement-copy p {
+      max-width: 62vw;
+    }
+
+    .announcement-actions a {
+      display: none;
+    }
+
     .brand-copy small {
       display: none;
     }
