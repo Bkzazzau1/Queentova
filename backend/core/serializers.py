@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
 from .models import (
+    Announcement,
     Campaign,
     ContactSubmission,
     Event,
+    FAQ,
     FounderAchievement,
     FounderProfile,
     GalleryItem,
@@ -195,3 +197,21 @@ class SupportRequestSerializer(serializers.ModelSerializer):
                 "Provide at least an email address or phone number for follow-up."
             )
         return attrs
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = [
+            "title", "slug", "message", "kind", "link_label", "link_url",
+            "starts_at", "ends_at", "dismissible", "priority", "published_at",
+        ]
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = [
+            "question", "slug", "answer", "category", "featured",
+            "display_order", "published_at",
+        ]
