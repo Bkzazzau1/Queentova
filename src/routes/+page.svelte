@@ -63,8 +63,8 @@
       </p>
 
       <div class="hero-actions">
-        <a class="btn btn-primary" href="#programs">Explore our mission <span>↗</span></a>
-        <a class="btn btn-secondary" href="#founder">Meet the founder</a>
+        <a class="btn btn-primary" href="/programs">Explore our mission <span>↗</span></a>
+        <a class="btn btn-secondary" href="/about#founder">Meet the founder</a>
       </div>
 
       <div class="hero-note">
@@ -76,20 +76,19 @@
       </div>
     </div>
 
-    <div class="identity card" aria-label="Queen Tovah brand identity">
+    <div class="identity card" aria-label="Queen Tovah Cares Foundation International">
       <div class="identity-glow"></div>
-      <div class="crown" aria-hidden="true">♛</div>
-      <div class="monogram">
-        <span>Q</span>
-        <span class="t">T</span>
-        <div class="globe">
-          <i></i><i></i><i></i>
-        </div>
+      <img
+        class="official-logo"
+        src="/brand/queen-tovah-logo.webp"
+        alt="Queen Tovah Cares Foundation International logo"
+        width="420"
+        height="280"
+      />
+      <div class="identity-caption">
+        <span>Global humanitarian service</span>
+        <strong>It is good to be good.</strong>
       </div>
-      <p class="identity-name">Queen Tovah</p>
-      <p class="identity-sub">Cares Foundation International</p>
-      <p class="motto">It is good to be good.</p>
-      <span class="logo-note">Official logo artwork will sit here in production.</span>
     </div>
   </div>
 
@@ -225,8 +224,8 @@
       <h2>Good grows when people choose to participate.</h2>
     </div>
     <div class="cta-actions">
-      <a class="btn btn-primary" href="mailto:info@queentovah.org">Partner with us</a>
-      <a class="btn btn-secondary" href="#programs">Explore programs</a>
+      <a class="btn btn-primary" href="/contact">Partner with us</a>
+      <a class="btn btn-secondary" href="/programs">Explore programs</a>
     </div>
   </div>
 </section>
@@ -380,124 +379,37 @@
     filter: blur(50px);
   }
 
-  .crown {
+  .official-logo {
     position: relative;
     z-index: 2;
-    margin-bottom: -8px;
-    color: var(--gold-bright);
-    font-size: 3.1rem;
-    filter: drop-shadow(0 6px 14px rgba(201, 151, 63, 0.22));
+    width: min(100%, 420px);
+    border-radius: 22px;
+    filter: drop-shadow(0 28px 46px rgba(0, 0, 0, 0.42));
   }
 
-  .monogram {
+  .identity-caption {
     position: relative;
-    z-index: 1;
-    width: 230px;
-    height: 210px;
-    color: transparent;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 13rem;
+    z-index: 2;
+    display: grid;
+    gap: 4px;
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .identity-caption span {
+    color: #a996a8;
+    font-size: 0.72rem;
     font-weight: 700;
-    line-height: 0.8;
-    -webkit-text-stroke: 2px var(--gold-bright);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
   }
 
-  .monogram > span:first-child {
-    position: absolute;
-    left: -4px;
-    top: 10px;
-  }
-
-  .monogram .t {
-    position: absolute;
-    top: 22px;
-    right: 8px;
-    color: rgba(100, 25, 111, 0.7);
-    -webkit-text-stroke: 1px var(--gold-bright);
-  }
-
-  .globe {
-    position: absolute;
-    top: 74px;
-    left: 43px;
-    width: 88px;
-    height: 88px;
-    border: 1px solid rgba(240, 221, 173, 0.85);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .globe::before,
-  .globe::after,
-  .globe i {
-    position: absolute;
-    border: 1px solid rgba(240, 221, 173, 0.44);
-    border-radius: 50%;
-    content: '';
-  }
-
-  .globe::before {
-    inset: 7px 26px;
-  }
-
-  .globe::after {
-    inset: 26px 7px;
-  }
-
-  .globe i:nth-child(1) {
-    inset: 0 42px;
-    border-radius: 0;
-    border-width: 0 1px 0 0;
-  }
-
-  .globe i:nth-child(2) {
-    inset: 42px 0;
-    border-radius: 0;
-    border-width: 1px 0 0;
-  }
-
-  .identity-name {
-    position: relative;
-    z-index: 1;
-    margin: 0;
+  .identity-caption strong {
     color: var(--champagne);
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 2.25rem;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .identity-sub {
-    position: relative;
-    z-index: 1;
-    margin: 4px 0 0;
-    color: var(--gold-bright);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .motto {
-    position: relative;
-    z-index: 1;
-    margin: 18px 0 0;
-    color: #c7a1c9;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.2rem;
+    font-size: 1.28rem;
     font-style: italic;
-  }
-
-  .logo-note {
-    position: absolute;
-    right: 22px;
-    bottom: 18px;
-    left: 22px;
-    color: #716170;
-    font-size: 0.65rem;
-    text-align: center;
+    font-weight: 600;
   }
 
   .trust-strip {
