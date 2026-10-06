@@ -263,3 +263,39 @@ export interface Partner {
   logo: string | null;
   published_at: string | null;
 }
+
+
+export interface ResourceItem {
+  title: string;
+  slug: string;
+  category: 'annual-report' | 'impact-report' | 'policy' | 'press-kit' | 'publication';
+  summary: string;
+  year: number | null;
+  file: string | null;
+  external_url: string;
+  thumbnail: string | null;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at?: string | null;
+}
+
+export interface SupportRequestPayload {
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  city: string;
+  assistance_type: 'general' | 'education' | 'family' | 'shelter' | 'livelihood' | 'other';
+  request_summary: string;
+  consent_to_contact: boolean;
+}
+
+export async function submitSupportRequest(payload: SupportRequestPayload): Promise<void> {
+  const response = await fetch(`${baseUrl()}/request-support/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) throw new Error('Unable to submit support request.');
+}
