@@ -31,6 +31,9 @@ router.register("partners", PartnerViewSet, basename="partner")
 router.register("campaigns", CampaignViewSet, basename="campaign")
 router.register("events", EventViewSet, basename="event")
 router.register("site-profile", SiteProfileViewSet, basename="site-profile")
+router.register("campaigns", CampaignViewSet, basename="campaign")
+router.register("events", EventViewSet, basename="event")
+router.register("site-profile", SiteProfileViewSet, basename="site-profile")
 
 urlpatterns = [
     path("", include(router.urls)),
