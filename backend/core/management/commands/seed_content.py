@@ -3,7 +3,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from core.models import FounderAchievement, FounderProfile, Program, SiteProfile, Story
+from core.models import FAQ, FounderAchievement, FounderProfile, Program, SiteProfile, Story
 
 
 class Command(BaseCommand):
@@ -130,5 +130,65 @@ class Command(BaseCommand):
                 **published,
             },
         )
+
+
+
+        faqs = [
+            (
+                "How can I request humanitarian support?",
+                "request-humanitarian-support",
+                "support",
+                "Use the private Request Support page. The initial form asks only for a brief description and a way to contact you. Submitting a request does not guarantee assistance; it allows the Foundation to review the situation privately.",
+                1,
+            ),
+            (
+                "How do I know a donation or payment link is official?",
+                "official-donation-links",
+                "giving",
+                "Use only giving links published on the official Queen Tovah Cares Foundation International website. If the website does not show an approved payment channel, contact the Foundation before sending money.",
+                2,
+            ),
+            (
+                "Where are scholarship opportunities published?",
+                "where-scholarships-are-published",
+                "scholarship",
+                "Verified scholarship opportunities are published on the Scholarships page with their application status, eligibility information and official application link when available.",
+                3,
+            ),
+            (
+                "How can I volunteer?",
+                "how-to-volunteer",
+                "volunteer",
+                "Use the Get Involved page to submit your interests, skills and availability. Volunteer applications are reviewed privately by authorised Foundation administrators.",
+                4,
+            ),
+            (
+                "Can an organisation partner with the Foundation?",
+                "organisation-partnerships",
+                "partnership",
+                "Yes. Organisations and institutions can contact the Foundation to discuss humanitarian, education, youth, community-development, sponsorship or professional collaborations.",
+                5,
+            ),
+            (
+                "Is the Foundation politically motivated?",
+                "political-independence",
+                "general",
+                "Public reporting describes Queen Tovah Cares Foundation International as humanitarian in focus and not politically motivated. Its stated work centres on vulnerable people, education, empowerment and community development.",
+                6,
+            ),
+        ]
+
+        for question, slug, category, answer, order in faqs:
+            FAQ.objects.update_or_create(
+                slug=slug,
+                defaults={
+                    "question": question,
+                    "category": category,
+                    "answer": answer,
+                    "display_order": order,
+                    "featured": order <= 3,
+                    **published,
+                },
+            )
 
         self.stdout.write(self.style.SUCCESS("Queen Tovah seed content is ready."))
