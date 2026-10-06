@@ -57,6 +57,8 @@
       <p class="label">Participate</p>
       <a href="/events">Events</a>
       <a href="/scholarships">Scholarships</a>
+      <a href="/request-support">Request Support</a>
+      <a href="/resources">Reports & Resources</a>
       <a href="/get-involved">Volunteer & Get Involved</a>
       <a href="/donate">Support the Mission</a>
       <a href="/contact">Contact the Foundation</a>
