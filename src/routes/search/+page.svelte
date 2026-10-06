@@ -12,7 +12,8 @@
     story: 'Story',
     campaign: 'Cause',
     event: 'Event',
-    resource: 'Resource'
+    resource: 'Resource',
+    faq: 'FAQ'
   };
 </script>
 
