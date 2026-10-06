@@ -310,6 +310,66 @@ class NewsletterSubscriber(models.Model):
         return self.email
 
 
+class Resource(PublishableModel):
+    class Category(models.TextChoices):
+        ANNUAL_REPORT = "annual-report", "Annual report"
+        IMPACT_REPORT = "impact-report", "Impact report"
+        POLICY = "policy", "Policy"
+        PRESS_KIT = "press-kit", "Press kit"
+        PUBLICATION = "publication", "Publication"
+
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    category = models.CharField(max_length=24, choices=Category.choices, default=Category.PUBLICATION)
+    summary = models.TextField(blank=True)
+    year = models.PositiveSmallIntegerField(blank=True, null=True)
+    file = models.FileField(upload_to="resources/%Y/", blank=True, null=True)
+    external_url = models.URLField(blank=True)
+    thumbnail = models.ImageField(upload_to="resources/thumbnails/", blank=True, null=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-year", "title"]
+
+    def __str__(self):
+        return self.title
+
+
+class SupportRequest(models.Model):
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        REVIEWING = "reviewing", "Reviewing"
+        FOLLOW_UP = "follow-up", "Follow up"
+        CLOSED = "closed", "Closed"
+
+    class AssistanceType(models.TextChoices):
+        GENERAL = "general", "General humanitarian support"
+        EDUCATION = "education", "Education"
+        FAMILY = "family", "Family support"
+        SHELTER = "shelter", "Shelter / housing"
+        LIVELIHOOD = "livelihood", "Livelihood / empowerment"
+        OTHER = "other", "Other"
+
+    name = models.CharField(max_length=180)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=60, blank=True)
+    country = models.CharField(max_length=120)
+    city = models.CharField(max_length=120, blank=True)
+    assistance_type = models.CharField(max_length=20, choices=AssistanceType.choices, default=AssistanceType.GENERAL)
+    request_summary = models.TextField()
+    consent_to_contact = models.BooleanField(default=False)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.NEW, db_index=True)
+    internal_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} — {self.get_assistance_type_display()}"
+
+
 class ContactSubmission(models.Model):
     class Status(models.TextChoices):
         NEW = "new", "New"
