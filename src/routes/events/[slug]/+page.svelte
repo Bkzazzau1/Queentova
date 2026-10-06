@@ -80,6 +80,15 @@
       {:else}
         <a class="btn btn-secondary" href="/contact">Ask about this event</a>
       {/if}
+      <a class="calendar-link" href={`/events/${event.slug}/calendar.ics`}>＋ Add to calendar</a>
+      {#if event.address}
+        <a
+          class="directions-link"
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([event.venue_name,event.address,event.city,event.country].filter(Boolean).join(', '))}`}
+          target="_blank"
+          rel="noreferrer"
+        >Get directions ↗</a>
+      {/if}
     </aside>
   </div>
 </section>
@@ -96,5 +105,7 @@
   dt{color:#9a8059;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
   dd{margin:5px 0 0;color:#4b3547;font-size:.9rem}
   aside .btn{width:100%;margin-top:26px}
+  .calendar-link,.directions-link{display:block;margin-top:13px;color:#8e6020;font-size:.78rem;font-weight:700;text-align:center}
+  .directions-link{margin-top:8px;color:#745e6e}
   @media(max-width:850px){.shell{grid-template-columns:1fr}aside{position:static}}
 </style>
