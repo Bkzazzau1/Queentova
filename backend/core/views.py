@@ -212,7 +212,7 @@ class SearchView(APIView):
                 "type": "resource",
                 "title": item.title,
                 "excerpt": item.summary or item.get_category_display(),
-                "url": "/resources",
+                "url": f"/resources/{item.slug}",
             })
 
         return Response({"query": query, "results": results[:24]})
