@@ -9,6 +9,10 @@ export interface Program {
   body: string;
   icon: string;
   featured: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at?: string | null;
 }
 
 export interface Story {
@@ -23,6 +27,10 @@ export interface Story {
   featured: boolean;
   source_name: string;
   source_url: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at?: string | null;
 }
 
 export interface GalleryItem {
