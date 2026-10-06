@@ -11,9 +11,11 @@ from .models import (
     NewsletterSubscriber,
     Partner,
     Program,
+    Resource,
     Scholarship,
     SiteProfile,
     Story,
+    SupportRequest,
     VolunteerApplication,
 )
 
@@ -162,3 +164,34 @@ class NewsletterSubscriberSerializer(serializers.ModelSerializer):
             },
         )
         return subscriber
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resource
+        fields = [
+            "title", "slug", "category", "summary", "year", "file",
+            "external_url", "thumbnail", "seo_title", "seo_description",
+            "seo_keywords", "published_at",
+        ]
+
+
+class SupportRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupportRequest
+        fields = [
+            "id", "name", "email", "phone", "country", "city",
+            "assistance_type", "request_summary", "consent_to_contact", "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+    def validate(self, attrs):
+        if not attrs.get("consent_to_contact"):
+            raise serializers.ValidationError(
+                {"consent_to_contact": "Consent is required so the Foundation can respond."}
+            )
+        if not attrs.get("email") and not attrs.get("phone"):
+            raise serializers.ValidationError(
+                "Provide at least an email address or phone number for follow-up."
+            )
+        return attrs
