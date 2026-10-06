@@ -12,9 +12,11 @@ from .models import (
     NewsletterSubscriber,
     Partner,
     Program,
+    Resource,
     Scholarship,
     SiteProfile,
     Story,
+    SupportRequest,
     VolunteerApplication,
 )
 
@@ -147,6 +149,26 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
     list_filter = ("status", "enquiry_type", "created_at")
     search_fields = ("name", "email", "message")
     readonly_fields = ("name", "email", "enquiry_type", "message", "created_at", "updated_at")
+    ordering = ("-created_at",)
+
+
+@admin.register(Resource)
+class ResourceAdmin(PublishWorkflowAdmin):
+    list_display = ("title", "category", "year", "status", "display_order")
+    list_filter = ("status", "category", "year")
+    search_fields = ("title", "summary")
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(SupportRequest)
+class SupportRequestAdmin(admin.ModelAdmin):
+    list_display = ("name", "assistance_type", "country", "status", "created_at")
+    list_filter = ("status", "assistance_type", "country", "created_at")
+    search_fields = ("name", "email", "phone", "country", "city", "request_summary")
+    readonly_fields = (
+        "name", "email", "phone", "country", "city", "assistance_type",
+        "request_summary", "consent_to_contact", "created_at", "updated_at"
+    )
     ordering = ("-created_at",)
 
 
