@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
   const { event } = data;
@@ -7,6 +8,38 @@
   const date = new Intl.DateTimeFormat('en', { dateStyle:'full' }).format(start);
   const time = new Intl.DateTimeFormat('en', { timeStyle:'short' }).format(start);
   const location = [event.venue_name, event.city, event.country].filter(Boolean).join(' • ');
+
+  const eventSchema = $derived(
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: event.title,
+      description: event.summary,
+      startDate: event.starts_at,
+      ...(event.ends_at ? { endDate: event.ends_at } : {}),
+      url: `${page.url.origin}${page.url.pathname}`,
+      ...(event.image ? { image: [event.image] } : {}),
+      ...(event.venue_name || event.address || event.city || event.country
+        ? {
+            location: {
+              '@type': 'Place',
+              name: event.venue_name || event.city || 'Queen Tovah Foundation event',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: event.address || undefined,
+                addressLocality: event.city || undefined,
+                addressCountry: event.country || undefined
+              }
+            }
+          }
+        : {}),
+      organizer: {
+        '@type': 'NGO',
+        name: 'Queen Tovah Cares Foundation International',
+        url: page.url.origin
+      }
+    }).replace(/</g, '\\u003c')
+  );
 </script>
 
 <svelte:head>
@@ -16,6 +49,7 @@
   <meta property="og:title" content={event.seo_title || event.title} />
   <meta property="og:description" content={event.seo_description || event.summary} />
   {#if event.image}<meta property="og:image" content={event.image} />{/if}
+  {@html `<script type="application/ld+json">${eventSchema}</script>`}
 </svelte:head>
 
 <PageHero eyebrow="Foundation event" title={event.title} copy={event.summary} />
