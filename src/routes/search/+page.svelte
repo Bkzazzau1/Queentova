@@ -11,7 +11,8 @@
     program: 'Program',
     story: 'Story',
     campaign: 'Cause',
-    event: 'Event'
+    event: 'Event',
+    resource: 'Resource'
   };
 </script>
 
