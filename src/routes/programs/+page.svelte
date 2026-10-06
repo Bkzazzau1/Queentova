@@ -13,24 +13,28 @@
       number:'01',
       title:'Humanitarian Support',
       copy:'Direct assistance for vulnerable people and families, including widows, widowers, indigent people and people experiencing homelessness.',
+      slug:'humanitarian-support',
       points:['Family support','Relief and welfare interventions','Support guided by genuine need']
     },
     {
       number:'02',
       title:'Education & Scholarships',
       copy:'Scholarship support designed to keep financial hardship from becoming a permanent barrier to education and personal development.',
+      slug:'education-scholarships',
       points:['Scholarship awards','Support for indigent learners','Education-focused opportunity']
     },
     {
       number:'03',
       title:'Youth Empowerment & Sports',
       copy:'Youth-focused initiatives that use sports and constructive engagement to promote unity, participation and healthy community life.',
+      slug:'youth-sports',
       points:['Community sports support','Youth engagement','Unity through participation']
     },
     {
       number:'04',
       title:'Human Capital & Community Development',
       copy:'Programs that strengthen people and communities through practical support, capacity building and locally relevant interventions.',
+      slug:'community-development',
       points:['Community-led initiatives','Human-capital development','Longer-term empowerment']
     }
   ];
@@ -40,6 +44,7 @@
         number: String(index + 1).padStart(2, '0'),
         title: program.title,
         copy: program.summary,
+        slug: program.slug,
         points: program.body
           ? program.body.split('\n').map((item) => item.trim()).filter(Boolean)
           : []
@@ -60,7 +65,7 @@
       <article class="program">
         <div class="number">{program.number}</div>
         <div>
-          <h2>{program.title}</h2>
+          <h2><a href={program.slug ? `/programs/${program.slug}` : '/programs'}>{program.title}</a></h2>
           <p>{program.copy}</p>
         </div>
         {#if program.points.length}
@@ -89,6 +94,7 @@
   .program:first-child{border-top:1px solid rgba(80,45,70,.14)}
   .number{padding-top:7px;color:#a8762c;font-size:.76rem;font-weight:700}
   h2{margin:0;color:#3d2039;font:600 clamp(2rem,4vw,3.25rem)/1 'Cormorant Garamond',Georgia,serif}
+  h2 a:hover{color:#8e6020}
   .program p{max-width:650px;margin:14px 0 0;color:#675864}
   ul{margin:8px 0 0;padding:0;list-style:none}
   li{position:relative;border-bottom:1px solid rgba(80,45,70,.08);padding:9px 0 9px 20px;color:#755f70;font-size:.9rem}
