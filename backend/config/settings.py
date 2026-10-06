@@ -116,5 +116,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "240/hour",
         "contact": "8/hour",
+        "volunteer": "5/hour",
+        "newsletter": "12/hour",
     },
 }
