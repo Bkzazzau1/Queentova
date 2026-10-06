@@ -1,19 +1,54 @@
+import { env } from '$env/dynamic/public';
 import type { RequestHandler } from './$types';
 
-const routes = [
+const staticRoutes = [
   '/',
   '/about',
   '/founder/jessie-ifeoma-udoka-menuba',
   '/programs',
+  '/causes',
   '/impact',
   '/news',
+  '/events',
+  '/scholarships',
   '/gallery',
+  '/get-involved',
   '/donate',
   '/contact'
 ];
 
-export const GET: RequestHandler = ({ url }) => {
+function apiBase() {
+  return (env.PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1').replace(/\/$/, '');
+}
+
+async function dynamicRoutes(fetcher: typeof fetch, endpoint: string, prefix: string) {
+  try {
+    const response = await fetcher(`${apiBase()}/${endpoint}/?page_size=100`);
+    if (!response.ok) return [];
+    const data = await response.json();
+    const items = Array.isArray(data) ? data : (data.results ?? []);
+    return items
+      .filter((item: { slug?: string }) => Boolean(item.slug))
+      .map((item: { slug: string }) => `${prefix}/${item.slug}`);
+  } catch {
+    return [];
+  }
+}
+
+export const GET: RequestHandler = async ({ url, fetch }) => {
+  const dynamic = (
+    await Promise.all([
+      dynamicRoutes(fetch, 'programs', '/programs'),
+      dynamicRoutes(fetch, 'stories', '/news'),
+      dynamicRoutes(fetch, 'campaigns', '/causes'),
+      dynamicRoutes(fetch, 'events', '/events'),
+      dynamicRoutes(fetch, 'scholarships', '/scholarships')
+    ])
+  ).flat();
+
+  const routes = [...new Set([...staticRoutes, ...dynamic])];
   const today = new Date().toISOString().slice(0, 10);
+
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${routes
