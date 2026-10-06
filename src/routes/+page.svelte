@@ -18,24 +18,28 @@
   const fallbackPrograms = [
     {
       number: '01',
+      slug: 'humanitarian-support',
       title: 'Humanitarian Support',
       copy: 'Practical care for vulnerable people and families, with dignity at the centre of every intervention.',
       icon: 'heart'
     },
     {
       number: '02',
+      slug: 'education-scholarships',
       title: 'Education & Scholarships',
       copy: 'Opening doors to learning for indigent students and people whose potential should not be limited by circumstance.',
       icon: 'book'
     },
     {
       number: '03',
+      slug: 'youth-sports',
       title: 'Youth & Sports',
       copy: 'Using sport, mentorship and shared experiences to bring young people together and strengthen communities.',
       icon: 'spark'
     },
     {
       number: '04',
+      slug: 'community-development',
       title: 'Community Development',
       copy: 'Supporting human capital and community-led progress through initiatives designed around real local needs.',
       icon: 'people'
@@ -45,11 +49,18 @@
   const programs = data.programs.length
     ? data.programs.slice(0, 4).map((program, index) => ({
         number: String(index + 1).padStart(2, '0'),
+        slug: program.slug,
         title: program.title,
         copy: program.summary,
         icon: program.icon || 'people'
       }))
     : fallbackPrograms;
+
+  const featuredCampaign = data.campaigns.find((campaign) => campaign.featured) ?? data.campaigns[0] ?? null;
+  const nextEvent = data.events[0] ?? null;
+  const featuredScholarship = data.scholarships.find((item) => item.application_status === 'open') ?? data.scholarships[0] ?? null;
+  const latestStories = data.stories.slice(0, 3);
+  const visiblePartners = data.partners.slice(0, 6);
 
   const principles = [
     ['Global outlook', 'Service is not confined by geography; compassion should reach wherever it is genuinely needed.'],
@@ -154,7 +165,7 @@
 
     <div class="program-grid">
       {#each programs as program}
-        <article class="program-card card">
+        <a class="program-card card" href={`/programs/${program.slug}`}>
           <div class="program-top">
             <span class="program-number">{program.number}</span>
             <span class="program-arrow">↗</span>
@@ -172,7 +183,7 @@
           </div>
           <h3>{program.title}</h3>
           <p>{program.copy}</p>
-        </article>
+        </a>
       {/each}
     </div>
   </div>
@@ -202,6 +213,105 @@
     </div>
   </div>
 </section>
+
+<section class="mission-live">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">The mission, live</p>
+        <h2 class="section-title">More ways to take part.</h2>
+      </div>
+      <p class="section-copy">Causes, events and opportunities are published from the Foundation's verified content system.</p>
+    </div>
+
+    <div class="live-grid">
+      {#if featuredCampaign}
+        <a class="live-card campaign-card" href={`/causes/${featuredCampaign.slug}`}>
+          <span class="live-label">Featured cause</span>
+          <div>
+            <h3>{featuredCampaign.title}</h3>
+            <p>{featuredCampaign.summary}</p>
+          </div>
+          <span class="live-action">Explore cause ↗</span>
+        </a>
+      {/if}
+
+      {#if nextEvent}
+        <a class="live-card event-card" href={`/events/${nextEvent.slug}`}>
+          <span class="live-label">Foundation event</span>
+          <div>
+            <small>{new Intl.DateTimeFormat('en', { dateStyle:'medium' }).format(new Date(nextEvent.starts_at))}</small>
+            <h3>{nextEvent.title}</h3>
+            <p>{nextEvent.city || nextEvent.country || nextEvent.summary}</p>
+          </div>
+          <span class="live-action">Event details ↗</span>
+        </a>
+      {/if}
+
+      {#if featuredScholarship}
+        <a class="live-card scholarship-card" href={`/scholarships/${featuredScholarship.slug}`}>
+          <span class="live-label">{featuredScholarship.application_status === 'open' ? 'Applications open' : 'Scholarship'}</span>
+          <div>
+            <h3>{featuredScholarship.title}</h3>
+            <p>{featuredScholarship.summary}</p>
+          </div>
+          <span class="live-action">View opportunity ↗</span>
+        </a>
+      {/if}
+
+      <a class="live-card involved-card" href="/get-involved">
+        <span class="live-label">Participate</span>
+        <div>
+          <h3>Bring your time, skills or partnership.</h3>
+          <p>Volunteer, collaborate or stay connected to work that matters.</p>
+        </div>
+        <span class="live-action">Get involved ↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{#if latestStories.length}
+<section class="latest-stories">
+  <div class="container">
+    <div class="section-head stories-head">
+      <div>
+        <p class="eyebrow">Stories & updates</p>
+        <h2 class="section-title">The work behind the words.</h2>
+      </div>
+      <a class="view-all" href="/news">View all stories ↗</a>
+    </div>
+
+    <div class="story-preview-grid">
+      {#each latestStories as story, index}
+        <a class:lead-story={index === 0} class="story-preview" href={`/news/${story.slug}`}>
+          {#if story.hero_image}<img src={story.hero_image} alt={story.hero_alt || story.title} loading="lazy" />{/if}
+          <div class="story-shade"></div>
+          <div class="story-info">
+            <span>{story.category.replace('-', ' ')}</span>
+            <h3>{story.title}</h3>
+            <p>{story.excerpt}</p>
+          </div>
+        </a>
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
+
+{#if visiblePartners.length}
+<section class="partners">
+  <div class="container">
+    <p class="eyebrow">Collaboration</p>
+    <div class="partner-row">
+      {#each visiblePartners as partner}
+        {#if partner.website}<a href={partner.website} target="_blank" rel="noreferrer" aria-label={partner.title}>{#if partner.logo}<img src={partner.logo} alt={partner.title} />{:else}<span>{partner.title}</span>{/if}</a>
+        {:else}<div>{#if partner.logo}<img src={partner.logo} alt={partner.title} />{:else}<span>{partner.title}</span>{/if}</div>{/if}
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
 
 <section class="founder" id="founder">
   <div class="container founder-grid">
@@ -619,6 +729,240 @@
     font-size: 0.92rem;
   }
 
+
+  .mission-live {
+    padding: 126px 0;
+    background: var(--ivory);
+    color: #2a1926;
+  }
+
+  .mission-live .eyebrow,
+  .latest-stories .eyebrow,
+  .partners .eyebrow {
+    color: #8e6020;
+  }
+
+  .mission-live .section-title {
+    color: #321c2f;
+  }
+
+  .mission-live .section-copy {
+    color: #6d5b68;
+  }
+
+  .live-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 54px;
+  }
+
+  .live-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 330px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    border: 1px solid rgba(80,45,70,.13);
+    border-radius: 28px;
+    padding: 28px;
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+
+  .live-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 55px rgba(55,26,49,.1);
+  }
+
+  .campaign-card,
+  .involved-card {
+    background:
+      radial-gradient(circle at 84% 15%, rgba(225,189,106,.16), transparent 18rem),
+      linear-gradient(145deg, #4c1553, #150817);
+    color: var(--ivory);
+  }
+
+  .live-label {
+    width: fit-content;
+    border: 1px solid rgba(139,98,35,.2);
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: #9a6d2b;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .campaign-card .live-label,
+  .involved-card .live-label {
+    border-color: rgba(225,189,106,.25);
+    color: var(--gold-bright);
+  }
+
+  .live-card h3 {
+    max-width: 620px;
+    margin: 0;
+    color: #43213f;
+    font: 600 clamp(2rem,4vw,3.15rem)/.98 'Cormorant Garamond', Georgia, serif;
+  }
+
+  .campaign-card h3,
+  .involved-card h3 {
+    color: var(--champagne);
+  }
+
+  .live-card p {
+    max-width: 620px;
+    margin: 12px 0 0;
+    color: #6e5c69;
+  }
+
+  .campaign-card p,
+  .involved-card p {
+    color: #b6a5b4;
+  }
+
+  .live-card small {
+    display: block;
+    margin-bottom: 7px;
+    color: #9a6d2b;
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  .live-action {
+    color: #8e6020;
+    font-size: .78rem;
+    font-weight: 800;
+  }
+
+  .campaign-card .live-action,
+  .involved-card .live-action {
+    color: var(--gold-bright);
+  }
+
+  .latest-stories {
+    padding: 126px 0;
+    background: #090409;
+  }
+
+  .stories-head {
+    align-items: end;
+  }
+
+  .view-all {
+    color: var(--gold-bright);
+    font-size: .82rem;
+    font-weight: 700;
+  }
+
+  .story-preview-grid {
+    display: grid;
+    grid-template-columns: 1.3fr .85fr;
+    grid-template-rows: 260px 260px;
+    gap: 16px;
+    margin-top: 54px;
+  }
+
+  .story-preview {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(225,189,106,.16);
+    border-radius: 26px;
+    background: linear-gradient(145deg,#4c1553,#150817);
+  }
+
+  .story-preview.lead-story {
+    grid-row: 1 / 3;
+  }
+
+  .story-preview img {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .story-shade {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(7,2,7,.94), rgba(7,2,7,.12) 70%);
+  }
+
+  .story-info {
+    position: absolute;
+    right: 26px;
+    bottom: 26px;
+    left: 26px;
+  }
+
+  .story-info > span {
+    color: var(--gold-bright);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .story-info h3 {
+    margin: 7px 0 8px;
+    color: var(--ivory);
+    font: 600 1.8rem/1 'Cormorant Garamond', Georgia, serif;
+  }
+
+  .lead-story .story-info h3 {
+    font-size: clamp(2.4rem,4vw,3.6rem);
+  }
+
+  .story-info p {
+    max-width: 650px;
+    margin: 0;
+    color: #c5b8c3;
+    font-size: .84rem;
+  }
+
+  .partners {
+    padding: 62px 0;
+    border-top: 1px solid rgba(80,45,70,.1);
+    background: var(--cream);
+    color: #2b1827;
+  }
+
+  .partner-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .partner-row a,
+  .partner-row > div {
+    min-height: 84px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(80,45,70,.1);
+    border-radius: 16px;
+    padding: 14px;
+    background: rgba(255,255,255,.5);
+    color: #6d5b68;
+    font-size: .78rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .partner-row img {
+    max-width: 100%;
+    max-height: 46px;
+    object-fit: contain;
+  }
+
   .founder {
     padding: 126px 0;
     background: var(--ivory);
@@ -795,6 +1139,10 @@
       grid-template-columns: repeat(2, 1fr);
     }
 
+    .partner-row {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
     .impact-copy {
       position: static;
     }
@@ -849,6 +1197,22 @@
 
     .program-grid {
       grid-template-columns: 1fr;
+    }
+
+    .live-grid,
+    .story-preview-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+
+    .story-preview,
+    .story-preview.lead-story {
+      grid-row: auto;
+      min-height: 330px;
+    }
+
+    .partner-row {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .program-card {
