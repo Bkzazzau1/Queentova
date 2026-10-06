@@ -60,6 +60,7 @@
       <a href="/scholarships">Scholarships</a>
       <a href="/request-support">Request Support</a>
       <a href="/resources">Reports & Resources</a>
+      <a href="/media">Press & Media</a>
       <a href="/faq">Frequently Asked Questions</a>
       <a href="/get-involved">Volunteer & Get Involved</a>
       <a href="/donate">Support the Mission</a>
