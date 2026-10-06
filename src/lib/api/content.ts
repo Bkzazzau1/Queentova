@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource';
   title: string;
   excerpt: string;
   url: string;
