@@ -7,6 +7,9 @@
   import PageHero from '$lib/components/PageHero.svelte';
   import { submitContact, type ContactPayload } from '$lib/api/content';
 
+  let { data } = $props();
+  const profile = data.siteProfile;
+
   let form: ContactPayload = {
     name: '',
     email: '',
@@ -49,9 +52,18 @@
       <p class="eyebrow">Get in touch</p>
       <h2 class="section-title">Partnership begins with a clear purpose.</h2>
       <p>
-        The website now routes enquiries into the Foundation administration system. Official public
-        telephone, email and office details can be added here after Foundation confirmation.
+        Send a message through the secure Foundation enquiry system. Public contact details below appear
+        only when they have been approved in the Foundation administration profile.
       </p>
+
+      {#if profile?.contact_email || profile?.phone || profile?.whatsapp || profile?.office_address}
+        <div class="contact-cards">
+          {#if profile.contact_email}<a href={`mailto:${profile.contact_email}`}><span>Email</span><strong>{profile.contact_email}</strong></a>{/if}
+          {#if profile.phone}<a href={`tel:${profile.phone}`}><span>Phone</span><strong>{profile.phone}</strong></a>{/if}
+          {#if profile.whatsapp}<a href={`https://wa.me/${profile.whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>{profile.whatsapp}</strong></a>{/if}
+          {#if profile.office_address}<div><span>Office</span><strong>{profile.office_address}</strong></div>{/if}
+        </div>
+      {/if}
       <div class="topics">
         <span>Humanitarian support</span><span>Scholarships</span><span>Partnerships</span><span>Youth & sports</span><span>Community programs</span>
       </div>
@@ -88,6 +100,10 @@
   .contact-copy .eyebrow{color:#8e6020}
   .contact-copy .section-title{color:#341d31}
   .contact-copy>p:not(.eyebrow){max-width:600px;color:#6d5b68}
+  .contact-cards{display:grid;gap:9px;margin-top:26px}
+  .contact-cards a,.contact-cards div{display:grid;gap:3px;border:1px solid rgba(80,45,70,.12);border-radius:14px;padding:13px 15px;background:#fff}
+  .contact-cards span{color:#9b6c29;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .contact-cards strong{color:#4b3547;font-size:.88rem;font-weight:600}
   .topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
   .topics span{border:1px solid rgba(80,45,70,.15);border-radius:999px;padding:8px 13px;color:#705e6b;font-size:.78rem}
   form{display:grid;gap:18px;border-color:rgba(80,45,70,.13);padding:34px;background:#fff;color:#42243d;box-shadow:0 26px 70px rgba(60,30,50,.08)}
