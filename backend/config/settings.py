@@ -118,5 +118,6 @@ REST_FRAMEWORK = {
         "contact": "8/hour",
         "volunteer": "5/hour",
         "newsletter": "12/hour",
+        "support_request": "4/hour",
     },
 }
