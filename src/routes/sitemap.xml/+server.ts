@@ -13,6 +13,7 @@ const staticRoutes = [
   '/scholarships',
   '/request-support',
   '/resources',
+  '/faq',
   '/gallery',
   '/get-involved',
   '/donate',
