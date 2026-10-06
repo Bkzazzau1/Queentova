@@ -3,6 +3,7 @@
 
   const links = [
     { label: 'About', href: '/about' },
+    { label: 'Founder', href: '/founder/jessie-ifeoma-udoka-menuba' },
     { label: 'Programs', href: '/programs' },
     { label: 'Impact', href: '/impact' },
     { label: 'Stories', href: '/news' },
