@@ -11,6 +11,8 @@ const staticRoutes = [
   '/news',
   '/events',
   '/scholarships',
+  '/request-support',
+  '/resources',
   '/gallery',
   '/get-involved',
   '/donate',
@@ -42,7 +44,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       dynamicRoutes(fetch, 'stories', '/news'),
       dynamicRoutes(fetch, 'campaigns', '/causes'),
       dynamicRoutes(fetch, 'events', '/events'),
-      dynamicRoutes(fetch, 'scholarships', '/scholarships')
+      dynamicRoutes(fetch, 'scholarships', '/scholarships'),
+      dynamicRoutes(fetch, 'resources', '/resources')
     ])
   ).flat();
 
