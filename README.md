@@ -39,14 +39,22 @@ Foundation and homepage UI are in place on `main`:
 - partnership CTA
 - footer
 - brand favicon
+- official logo integration
+- About + Founder route
+- Programs route
+- Impact + accountability route
+- News / Stories route
+- Gallery route
+- Support / Donate route
+- Contact route
 - mobile responsive styling
 
 ## Next
 
-1. Add the official logo artwork to `static/brand`.
-2. Add approved founder photography and Foundation project photography.
-3. Replace temporary contact details with confirmed Foundation contacts.
-4. Build About, Programs, Impact, News/Stories, Gallery, Donate and Contact routes.
+1. Add approved founder photography and Foundation project photography.
+2. Confirm and publish official Foundation contact details.
+3. Connect the contact form and approved donation/payment channels.
+4. Add verified stories, gallery media and impact records.
 5. Add CMS/API layer after public-site content structure is approved.
 
 ### Guiding principle
