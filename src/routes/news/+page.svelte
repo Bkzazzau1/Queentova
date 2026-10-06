@@ -47,7 +47,7 @@
       </div>
       <div class="copy">
         <p class="eyebrow">Featured activity</p>
-        <h2>{featured.title}</h2>
+        <h2><a href={`/news/${featured.slug}`}>{featured.title}</a></h2>
         <p>{featured.excerpt}</p>
         {#if featured.source_url}
           <a class="source" href={featured.source_url} target="_blank" rel="noreferrer">
@@ -64,7 +64,7 @@
         {#each data.stories.filter((story) => story.slug !== featured.slug) as story}
           <article class="story-card">
             <span>{story.event_date?.slice(0,4) ?? 'Story'}</span>
-            <h3>{story.title}</h3>
+            <h3><a href={`/news/${story.slug}`}>{story.title}</a></h3>
             <p>{story.excerpt}</p>
             {#if story.source_url}<a href={story.source_url} target="_blank" rel="noreferrer">Read source ↗</a>{/if}
           </article>
@@ -91,6 +91,7 @@
   .copy .eyebrow{color:#8e6020}
   h2{margin:0;color:#40213c;font:600 clamp(2.4rem,5vw,4.4rem)/.98 'Cormorant Garamond',Georgia,serif}
   .copy>p:not(.eyebrow){margin:24px 0 0;color:#695966}
+  .copy h2 a:hover,.story-card h3 a:hover{color:#8e6020}
   .status,.source{display:block;margin-top:30px;border-top:1px solid rgba(80,45,70,.12);padding-top:20px;color:#9a825b;font-size:.8rem}
   .source{text-decoration:underline;text-underline-offset:3px}
   .story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
