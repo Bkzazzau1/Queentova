@@ -1,6 +1,7 @@
 <svelte:head>
   <title>About | Queen Tovah Cares Foundation International</title>
-  <meta name="description" content="Learn about Queen Tovah Cares Foundation International, its humanitarian mission and founder Princess Dr. Jessie Joseph." />
+  <meta name="description" content="Learn about Queen Tovah Cares Foundation International and its founder. Public coverage identifies Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi) as Founder/CEO." />
+  <meta name="keywords" content="Jessie Ifeoma Udoka-Menuba, Jessie Udoka-Menuba, Jessie Joseph, Queen Tovah Cares Foundation International, Queen-Tovah Foundation" />
 </svelte:head>
 
 <script lang="ts">
@@ -62,6 +63,7 @@
     <div>
       <p class="eyebrow">Founder</p>
       <h2 class="section-title">Princess Dr. Jessie Joseph</h2>
+      <p class="reported-name">Official public reporting repeatedly identifies the Founder/CEO as <a href="/founder/jessie-ifeoma-udoka-menuba">Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi)</a>.</p>
       <p class="founder-copy">
         Princess Dr. Jessie Joseph founded Queen Tovah Cares Foundation International around a
         conviction that philanthropy should reach people wherever need exists. Her vision combines
@@ -93,6 +95,8 @@
   .portrait-inner { height:100%; min-height:464px; display:grid; place-items:center; position:relative; border:1px solid rgba(225,189,106,.35); border-radius:45% 45% 18px 18px; color:#bdaebc; text-align:center; }
   .portrait-inner p { max-width:220px; }
   .crown { position:absolute; top:42px; color:var(--gold-bright); font-size:3.5rem; }
+  .reported-name { margin:18px 0 0; color:#8e6020; font-size:.9rem; }
+  .reported-name a { text-decoration:underline; text-underline-offset:3px; }
   .founder-copy { max-width:700px; margin:26px 0 0; color:#695966; }
   blockquote { margin:34px 0 0; color:#592b57; font:italic 600 clamp(2rem,4vw,3.2rem)/1 'Cormorant Garamond',Georgia,serif; }
   .faith { color:#8e6020; font-size:.78rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
