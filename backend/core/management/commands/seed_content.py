@@ -3,7 +3,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from core.models import FAQ, FounderAchievement, FounderProfile, HomepageSpotlight, Program, SiteProfile, Story
+from core.models import FAQ, FounderAchievement, FounderMediaItem, FounderProfile, HomepageSpotlight, Program, SiteProfile, Story
 
 
 class Command(BaseCommand):
@@ -134,6 +134,154 @@ class Command(BaseCommand):
 
 
 
+
+
+        founder_media = [
+            {
+                "slug": "professorship-award-crown-matron",
+                "title": "Professorship Award and Crown Matron recognition",
+                "kind": "award",
+                "summary": (
+                    "Anambra State Government reporting says Princess Dr. Jessie Ifeoma Udoka-Menuba "
+                    "received a Professorship Award from Crown Prince Ministerial College of Bishops "
+                    "and was installed as Crown Matron in recognition of humanitarian and ministerial service."
+                ),
+                "event_date": date(2024, 3, 30),
+                "publication_date": date(2024, 4, 3),
+                "source_name": "Anambra State Government",
+                "source_url": "https://anambrastate.gov.ng/founder-queen-tovah-cares-foundation-intl-recieves-professorship-award-installed-patroness-of-crown-princess-college-of-bishops/",
+                "source_domain": "anambrastate.gov.ng",
+                "award_title": "Professorship Award / Crown Matron",
+                "awarding_body": "Crown Prince Ministerial College of Bishops Inc. Nigeria",
+                "location": "Amawbia, Anambra State",
+                "featured": False,
+                "display_order": 1,
+            },
+            {
+                "slug": "mother-general-award-ugosimba-women",
+                "title": "Ugosimba Women honour her with Mother General Award",
+                "kind": "award",
+                "summary": (
+                    "Ugosimba Women Association, Amawbia recognised her leadership and humanitarian "
+                    "service with the Mother General Award."
+                ),
+                "event_date": date(2024, 12, 30),
+                "publication_date": date(2024, 12, 30),
+                "source_name": "Anambra State Government",
+                "source_url": "https://anambrastate.gov.ng/ugosimba-women-amawbia-honor-princess-dr-jessie-ifeoma-udoka-menuba-with-prestigious-mother-general-award/",
+                "source_domain": "anambrastate.gov.ng",
+                "award_title": "Mother General Award",
+                "awarding_body": "Ugosimba Women Association, Amawbia",
+                "location": "Amawbia, Anambra State",
+                "featured": True,
+                "display_order": 2,
+            },
+            {
+                "slug": "woman-of-the-decade-ahaejiejemba1",
+                "title": "Woman of the Decade and Ahaejiejemba1 honours",
+                "kind": "award",
+                "summary": (
+                    "Umuigbo United Assembly Worldwide conferred the Woman of the Decade and "
+                    "Ahaejiejemba1 honours, citing leadership, service and support for vulnerable people."
+                ),
+                "event_date": date(2025, 1, 11),
+                "publication_date": date(2025, 1, 11),
+                "source_name": "Anambra State Government",
+                "source_url": "https://anambrastate.gov.ng/founder-queen-tovah-cares-foundation-intl-receives-more-accolades-as-umuigbo-united-assembly-honors-her-with-prestigious-awards/",
+                "source_domain": "anambrastate.gov.ng",
+                "award_title": "Woman of the Decade / Ahaejiejemba1",
+                "awarding_body": "Umuigbo United Assembly Worldwide",
+                "location": "Enugu, Enugu State",
+                "featured": True,
+                "display_order": 3,
+            },
+            {
+                "slug": "nuj-philanthropist-of-the-21st-century",
+                "title": "NUJ Anambra Philanthropist of the 21st Century",
+                "kind": "award",
+                "summary": (
+                    "NUJ Anambra materials publicly identify Princess Dr. Jessie Ifeoma Udoka-Menuba "
+                    "as the 2025 Philanthropist of the 21st Century award recipient."
+                ),
+                "event_date": None,
+                "publication_date": date(2025, 8, 1),
+                "source_name": "NUJ Anambra / The WatchDog Magazine",
+                "source_url": "https://www.odogwublog.com/wp-content/uploads/2025/10/The-WatchDog-Magazine-Of-The-NUJ-Anambra-2025-1.pdf",
+                "source_domain": "odogwublog.com",
+                "award_title": "Philanthropist of the 21st Century",
+                "awarding_body": "Nigeria Union of Journalists, Anambra State Council",
+                "location": "Anambra State",
+                "featured": True,
+                "display_order": 4,
+            },
+            {
+                "slug": "amawbia-august-league-youth-empowerment",
+                "title": "National media covers Amawbia August League youth empowerment",
+                "kind": "news",
+                "summary": (
+                    "Independent Newspaper Nigeria reported on her sponsorship of the 2025 Amawbia "
+                    "August League football tournament as part of youth empowerment and community development."
+                ),
+                "event_date": date(2025, 8, 15),
+                "publication_date": date(2025, 8, 19),
+                "source_name": "Independent Newspaper Nigeria",
+                "source_url": "https://independent.ng/princess-udoka-menuba-kicks-poverty-out-with-amawbia-football-showdown/",
+                "source_domain": "independent.ng",
+                "award_title": "",
+                "awarding_body": "",
+                "location": "Amawbia, Anambra State",
+                "featured": False,
+                "display_order": 5,
+            },
+            {
+                "slug": "new-yam-and-birthday-public-profile",
+                "title": "Public profile highlighted during 2025 New Yam celebration",
+                "kind": "news",
+                "summary": (
+                    "Anambra State Government coverage of the 2025 New Yam celebration highlighted "
+                    "her philanthropy, community-development work and widely reported recognitions."
+                ),
+                "event_date": date(2025, 9, 29),
+                "publication_date": date(2025, 10, 2),
+                "source_name": "Anambra State Government",
+                "source_url": "https://anambrastate.gov.ng/rtd-air-commodore-udoka-menuba-celebrates-new-yam-festival-cum-wifes-birthday-in-grand-style/",
+                "source_domain": "anambrastate.gov.ng",
+                "award_title": "",
+                "awarding_body": "",
+                "location": "Amawbia, Anambra State",
+                "featured": False,
+                "display_order": 6,
+            },
+            {
+                "slug": "ada-di-iche-1-worldwide",
+                "title": "Ada Di Iche 1 Worldwide Award",
+                "kind": "award",
+                "summary": (
+                    "Umuada Nimo married to Amawbia conferred the Ada Di Iche 1 Worldwide Award "
+                    "for humanitarian work within the community and beyond."
+                ),
+                "event_date": date(2026, 4, 12),
+                "publication_date": date(2026, 4, 12),
+                "source_name": "Anambra State Government",
+                "source_url": "https://anambrastate.gov.ng/tag/a-shining-light-princess-jessie-udoka-menuba-honoured-with-ada-di-iche-1-worldwide-award/",
+                "source_domain": "anambrastate.gov.ng",
+                "award_title": "Ada Di Iche 1 Worldwide",
+                "awarding_body": "Umuada Nimo married to Amawbia",
+                "location": "Amawbia, Anambra State",
+                "featured": True,
+                "display_order": 7,
+            },
+        ]
+
+        for item in founder_media:
+            FounderMediaItem.objects.update_or_create(
+                slug=item["slug"],
+                defaults={
+                    **item,
+                    "verified_source": True,
+                    **published,
+                },
+            )
 
         HomepageSpotlight.objects.update_or_create(
             slug="amawbia-youth-sports-spotlight",
