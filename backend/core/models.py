@@ -267,6 +267,36 @@ class SiteProfile(PublishableModel):
         return self.display_name
 
 
+class HomepageSpotlight(PublishableModel):
+    class Style(models.TextChoices):
+        EDITORIAL = "editorial", "Editorial"
+        IMPACT = "impact", "Impact"
+        CAMPAIGN = "campaign", "Campaign"
+        OPPORTUNITY = "opportunity", "Opportunity"
+
+    eyebrow = models.CharField(max_length=100, blank=True)
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    summary = models.TextField()
+    image = models.ImageField(upload_to="spotlights/%Y/%m/", blank=True, null=True)
+    image_alt = models.CharField(max_length=220, blank=True)
+    link_label = models.CharField(max_length=80, default="Explore")
+    link_url = models.CharField(max_length=300)
+    secondary_label = models.CharField(max_length=80, blank=True)
+    secondary_url = models.CharField(max_length=300, blank=True)
+    style = models.CharField(max_length=20, choices=Style.choices, default=Style.EDITORIAL)
+    starts_at = models.DateTimeField(blank=True, null=True)
+    ends_at = models.DateTimeField(blank=True, null=True)
+    priority = models.PositiveSmallIntegerField(default=0)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-priority", "-published_at", "title"]
+
+    def __str__(self):
+        return self.title
+
+
 class Announcement(PublishableModel):
     class Kind(models.TextChoices):
         INFO = "info", "Information"
