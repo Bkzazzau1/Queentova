@@ -20,6 +20,7 @@ from .models import (
     ImpactStory,
     NewsletterSubscriber,
     Partner,
+    PartnerCollaboration,
     Program,
     Resource,
     Scholarship,
@@ -236,10 +237,133 @@ class ScholarshipAdmin(PublishWorkflowAdmin):
 
 @admin.register(Partner)
 class PartnerAdmin(PublishWorkflowAdmin):
-    list_display = ("title", "status", "display_order", "updated_at")
-    list_filter = ("status",)
-    search_fields = ("title", "description")
+    list_display = (
+        "title", "partner_type", "relationship_status",
+        "verified_relationship", "featured", "status", "updated_at",
+    )
+    list_filter = (
+        "status", "partner_type", "relationship_status",
+        "verified_relationship", "featured", "country",
+    )
+    search_fields = (
+        "title", "tagline", "description", "body", "city", "country",
+        "verification_note", "reference_url",
+    )
     prepopulated_fields = {"slug": ("title",)}
+    actions = ["move_to_review", "publish_selected", "return_to_draft"]
+    fieldsets = (
+        (
+            "Public profile",
+            {
+                "fields": (
+                    "title", "slug", "partner_type", "relationship_status",
+                    "tagline", "description", "body", "website", "logo",
+                    "hero_image", "hero_alt", "city", "country",
+                    "relationship_since", "relationship_ended",
+                    "featured", "display_order",
+                )
+            },
+        ),
+        (
+            "Relationship verification",
+            {
+                "fields": (
+                    "verified_relationship", "verification_note", "reference_url",
+                )
+            },
+        ),
+        (
+            "Publishing & SEO",
+            {
+                "fields": (
+                    "status", "published_at", "seo_title",
+                    "seo_description", "seo_keywords", "og_image",
+                    "created_at", "updated_at",
+                )
+            },
+        ),
+    )
+
+    @admin.action(description="Publish selected partners after verification checks")
+    def publish_selected(self, request, queryset):
+        published = 0
+        rejected = []
+
+        for obj in queryset:
+            obj.status = obj.PublicationStatus.PUBLISHED
+            if not obj.published_at:
+                obj.published_at = timezone.now()
+            try:
+                obj.full_clean()
+            except ValidationError as exc:
+                rejected.append(f"{obj.title}: {exc.message_dict}")
+                continue
+            obj.save()
+            published += 1
+
+        if published:
+            self.message_user(
+                request,
+                f"{published} partner profile{'s' if published != 1 else ''} published.",
+                level=messages.SUCCESS,
+            )
+        if rejected:
+            self.message_user(
+                request,
+                "Not published because verification was incomplete: "
+                + " | ".join(rejected),
+                level=messages.WARNING,
+            )
+
+
+@admin.register(PartnerCollaboration)
+class PartnerCollaborationAdmin(PublishWorkflowAdmin):
+    list_display = (
+        "title", "partner", "collaboration_status", "program",
+        "campaign", "verified_record", "featured", "status",
+    )
+    list_filter = (
+        "status", "collaboration_status", "verified_record",
+        "featured", "partner", "program",
+    )
+    search_fields = (
+        "title", "summary", "body", "partner__title",
+        "program__title", "campaign__title", "location_label",
+        "verification_note",
+    )
+    prepopulated_fields = {"slug": ("title",)}
+    actions = ["move_to_review", "publish_selected", "return_to_draft"]
+
+    @admin.action(description="Publish selected collaborations after verification checks")
+    def publish_selected(self, request, queryset):
+        published = 0
+        rejected = []
+
+        for obj in queryset:
+            obj.status = obj.PublicationStatus.PUBLISHED
+            if not obj.published_at:
+                obj.published_at = timezone.now()
+            try:
+                obj.full_clean()
+            except ValidationError as exc:
+                rejected.append(f"{obj.title}: {exc.message_dict}")
+                continue
+            obj.save()
+            published += 1
+
+        if published:
+            self.message_user(
+                request,
+                f"{published} collaboration record{'s' if published != 1 else ''} published.",
+                level=messages.SUCCESS,
+            )
+        if rejected:
+            self.message_user(
+                request,
+                "Not published because verification was incomplete: "
+                + " | ".join(rejected),
+                level=messages.WARNING,
+            )
 
 
 @admin.register(Campaign)
