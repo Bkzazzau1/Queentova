@@ -13,6 +13,7 @@ from .models import (
     FounderAchievement,
     FounderProfile,
     GalleryItem,
+    HomepageSpotlight,
     ImpactMetric,
     NewsletterSubscriber,
     Partner,
@@ -34,6 +35,7 @@ from .serializers import (
     FounderAchievementSerializer,
     FounderProfileSerializer,
     GalleryItemSerializer,
+    HomepageSpotlightSerializer,
     ImpactMetricSerializer,
     NewsletterSubscriberSerializer,
     PartnerSerializer,
@@ -268,3 +270,19 @@ class SupportRequestCreateView(generics.CreateAPIView):
     serializer_class = SupportRequestSerializer
     permission_classes = [permissions.AllowAny]
     throttle_scope = "support_request"
+
+
+class HomepageSpotlightViewSet(PublishedReadOnlyViewSet):
+    queryset = HomepageSpotlight.objects.all()
+    serializer_class = HomepageSpotlightSerializer
+    search_fields = ["eyebrow", "title", "summary", "style"]
+    ordering_fields = ["display_order", "priority", "published_at", "title"]
+
+    def get_queryset(self):
+        now = timezone.now()
+        return (
+            super()
+            .get_queryset()
+            .filter(Q(starts_at__isnull=True) | Q(starts_at__lte=now))
+            .filter(Q(ends_at__isnull=True) | Q(ends_at__gte=now))
+        )
