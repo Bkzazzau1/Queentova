@@ -24,6 +24,8 @@ from .models import (
     Program,
     Resource,
     Scholarship,
+    ScholarshipApplication,
+    ScholarshipApplicationDocument,
     SiteProfile,
     Story,
     SupportRequest,
@@ -229,10 +231,267 @@ class ImpactMetricAdmin(PublishWorkflowAdmin):
 
 @admin.register(Scholarship)
 class ScholarshipAdmin(PublishWorkflowAdmin):
-    list_display = ("title", "application_status", "opens_at", "closes_at", "status")
-    list_filter = ("status", "application_status")
-    search_fields = ("title", "summary", "eligibility")
+    list_display = (
+        "title", "application_status", "internal_applications_enabled",
+        "application_count", "approved_count", "public_results_released",
+        "opens_at", "closes_at", "status",
+    )
+    list_filter = (
+        "status", "application_status", "internal_applications_enabled",
+        "public_results_released",
+    )
+    search_fields = (
+        "title", "summary", "eligibility",
+        "application_instructions", "required_documents",
+    )
     prepopulated_fields = {"slug": ("title",)}
+    actions = ["move_to_review", "publish_selected", "return_to_draft"]
+
+    fieldsets = (
+        (
+            "Public scholarship",
+            {
+                "fields": (
+                    "title", "slug", "summary", "eligibility",
+                    "application_instructions", "required_documents",
+                    "application_status", "opens_at", "closes_at",
+                    "max_awards",
+                )
+            },
+        ),
+        (
+            "Application channel",
+            {
+                "fields": (
+                    "internal_applications_enabled", "application_url",
+                )
+            },
+        ),
+        (
+            "Public aggregate results",
+            {
+                "fields": (
+                    "public_results_released", "public_results_note",
+                )
+            },
+        ),
+        (
+            "Publishing & SEO",
+            {
+                "fields": (
+                    "status", "published_at", "seo_title",
+                    "seo_description", "seo_keywords", "og_image",
+                    "created_at", "updated_at",
+                )
+            },
+        ),
+    )
+
+    @admin.display(description="Applications")
+    def application_count(self, obj):
+        return obj.applications.count()
+
+    @admin.display(description="Approved")
+    def approved_count(self, obj):
+        return obj.applications.filter(
+            review_status=ScholarshipApplication.ReviewStatus.APPROVED
+        ).count()
+
+    @admin.action(description="Publish selected scholarships after validation")
+    def publish_selected(self, request, queryset):
+        published = 0
+        rejected = []
+
+        for obj in queryset:
+            obj.status = obj.PublicationStatus.PUBLISHED
+            if not obj.published_at:
+                obj.published_at = timezone.now()
+            try:
+                obj.full_clean()
+            except ValidationError as exc:
+                rejected.append(f"{obj.title}: {exc.message_dict}")
+                continue
+            obj.save()
+            published += 1
+
+        if published:
+            self.message_user(
+                request,
+                f"{published} scholarship{'s' if published != 1 else ''} published.",
+                level=messages.SUCCESS,
+            )
+        if rejected:
+            self.message_user(
+                request,
+                "Not published because configuration was invalid: "
+                + " | ".join(rejected),
+                level=messages.WARNING,
+            )
+
+
+class ScholarshipApplicationDocumentInline(admin.TabularInline):
+    model = ScholarshipApplicationDocument
+    extra = 0
+    can_delete = False
+    readonly_fields = ("document_type", "file", "original_name", "uploaded_at")
+    fields = readonly_fields
+
+
+@admin.register(ScholarshipApplication)
+class ScholarshipApplicationAdmin(admin.ModelAdmin):
+    list_display = (
+        "reference_code", "scholarship", "applicant_name", "review_status",
+        "eligibility_score", "overall_score", "assigned_reviewer",
+        "submitted_at",
+    )
+    list_filter = (
+        "review_status", "scholarship", "country", "submitted_at",
+    )
+    search_fields = (
+        "reference_code", "first_name", "last_name", "email",
+        "phone", "institution", "course_of_study",
+    )
+    date_hierarchy = "submitted_at"
+    inlines = [ScholarshipApplicationDocumentInline]
+    actions = [
+        "mark_screening", "mark_eligible", "mark_shortlisted",
+        "mark_approved", "mark_rejected",
+    ]
+    readonly_fields = (
+        "reference_code", "scholarship", "first_name", "last_name",
+        "email", "phone", "country", "city", "institution",
+        "course_of_study", "current_level", "academic_summary",
+        "financial_need_statement", "personal_statement",
+        "consent_to_processing", "declaration_true",
+        "submitted_at", "updated_at", "reviewed_at", "reviewed_by",
+    )
+    fieldsets = (
+        (
+            "Application identity",
+            {
+                "fields": (
+                    "reference_code", "scholarship", "first_name",
+                    "last_name", "email", "phone", "country", "city",
+                    "submitted_at",
+                )
+            },
+        ),
+        (
+            "Academic & need information",
+            {
+                "fields": (
+                    "institution", "course_of_study", "current_level",
+                    "academic_summary", "financial_need_statement",
+                    "personal_statement",
+                )
+            },
+        ),
+        (
+            "Applicant consent",
+            {
+                "fields": (
+                    "consent_to_processing", "declaration_true",
+                )
+            },
+        ),
+        (
+            "Internal review",
+            {
+                "fields": (
+                    "review_status", "eligibility_score", "merit_score",
+                    "need_score", "overall_score", "eligibility_note",
+                    "reviewer_notes", "assigned_reviewer",
+                    "reviewed_by", "reviewed_at", "updated_at",
+                )
+            },
+        ),
+    )
+
+    @admin.display(description="Applicant")
+    def applicant_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    def _set_status(self, request, queryset, review_status):
+        count = queryset.update(
+            review_status=review_status,
+            reviewed_by=request.user,
+            reviewed_at=timezone.now(),
+        )
+        self.message_user(
+            request,
+            f"{count} application{'s' if count != 1 else ''} updated.",
+            level=messages.SUCCESS,
+        )
+
+    @admin.action(description="Move selected applications to screening")
+    def mark_screening(self, request, queryset):
+        self._set_status(
+            request,
+            queryset,
+            ScholarshipApplication.ReviewStatus.SCREENING,
+        )
+
+    @admin.action(description="Mark selected applications eligible")
+    def mark_eligible(self, request, queryset):
+        self._set_status(
+            request,
+            queryset,
+            ScholarshipApplication.ReviewStatus.ELIGIBLE,
+        )
+
+    @admin.action(description="Shortlist selected applications")
+    def mark_shortlisted(self, request, queryset):
+        self._set_status(
+            request,
+            queryset,
+            ScholarshipApplication.ReviewStatus.SHORTLISTED,
+        )
+
+    @admin.action(description="Approve selected scholarship applications")
+    def mark_approved(self, request, queryset):
+        approved = 0
+        blocked = []
+
+        for application in queryset.select_related("scholarship"):
+            scholarship = application.scholarship
+            if scholarship.max_awards:
+                existing = scholarship.applications.filter(
+                    review_status=ScholarshipApplication.ReviewStatus.APPROVED
+                ).exclude(pk=application.pk).count()
+                if existing >= scholarship.max_awards:
+                    blocked.append(application.reference_code)
+                    continue
+
+            application.review_status = ScholarshipApplication.ReviewStatus.APPROVED
+            application.reviewed_by = request.user
+            application.reviewed_at = timezone.now()
+            application.save(
+                update_fields=[
+                    "review_status", "reviewed_by", "reviewed_at", "updated_at"
+                ]
+            )
+            approved += 1
+
+        if approved:
+            self.message_user(
+                request,
+                f"{approved} application{'s' if approved != 1 else ''} approved.",
+                level=messages.SUCCESS,
+            )
+        if blocked:
+            self.message_user(
+                request,
+                "Approval limit reached for: " + ", ".join(blocked),
+                level=messages.WARNING,
+            )
+
+    @admin.action(description="Reject selected scholarship applications")
+    def mark_rejected(self, request, queryset):
+        self._set_status(
+            request,
+            queryset,
+            ScholarshipApplication.ReviewStatus.REJECTED,
+        )
 
 
 @admin.register(Partner)
