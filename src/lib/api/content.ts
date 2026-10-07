@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { env } from '$env/dynamic/public';
 
 type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -89,7 +90,12 @@ export interface ContactPayload {
 }
 
 function baseUrl() {
-  return (env.PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1').replace(/\/$/, '');
+  // Local development falls back to the Django dev server. In production the site only calls a
+  // backend when PUBLIC_API_BASE_URL is configured; otherwise reads fall back to built-in content
+  // and forms report that they are unavailable, instead of calling localhost on visitors' devices.
+  const url = env.PUBLIC_API_BASE_URL || (dev ? 'http://localhost:8000/api/v1' : '');
+  if (!url) throw new Error('The Foundation content service is not configured.');
+  return url.replace(/\/$/, '');
 }
 
 export async function getCollection<T>(

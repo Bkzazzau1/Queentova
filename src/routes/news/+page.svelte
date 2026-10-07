@@ -5,22 +5,11 @@
 
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
+  import { fallbackStories } from '$lib/content/stories';
 
   let { data } = $props();
 
-  const fallbackStory = {
-    slug: 'amawbia-august-league-2025',
-    title: 'Supporting youth unity through the Amawbia August League.',
-    excerpt: 'Queen Tovah Cares Foundation International sponsored the 2025 Amawbia August League football tournament as part of its support for sports, youth engagement and community unity in Anambra.',
-    category: 'Youth & Sports',
-    event_date: '2025-08-01',
-    hero_image: null,
-    hero_alt: '',
-    source_name: '',
-    source_url: ''
-  };
-
-  const featured = $derived(data.stories.find((story) => story.featured) ?? data.stories[0] ?? fallbackStory);
+  const featured = $derived(data.stories.find((story) => story.featured) ?? data.stories[0] ?? fallbackStories[0]);
   const year = $derived(featured.event_date ? featured.event_date.slice(0, 4) : 'Foundation');
   const category = $derived(featured.category
     .split('-')

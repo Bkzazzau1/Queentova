@@ -5,51 +5,19 @@
 
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
+  import { fallbackPrograms } from '$lib/content/programs';
 
   let { data } = $props();
 
-  const fallbackPrograms = [
-    {
-      number:'01',
-      title:'Humanitarian Support',
-      copy:'Direct assistance for vulnerable people and families, including widows, widowers, indigent people and people experiencing homelessness.',
-      slug:'humanitarian-support',
-      points:['Family support','Relief and welfare interventions','Support guided by genuine need']
-    },
-    {
-      number:'02',
-      title:'Education & Scholarships',
-      copy:'Scholarship support designed to keep financial hardship from becoming a permanent barrier to education and personal development.',
-      slug:'education-scholarships',
-      points:['Scholarship awards','Support for indigent learners','Education-focused opportunity']
-    },
-    {
-      number:'03',
-      title:'Youth Empowerment & Sports',
-      copy:'Youth-focused initiatives that use sports and constructive engagement to promote unity, participation and healthy community life.',
-      slug:'youth-sports',
-      points:['Community sports support','Youth engagement','Unity through participation']
-    },
-    {
-      number:'04',
-      title:'Human Capital & Community Development',
-      copy:'Programs that strengthen people and communities through practical support, capacity building and locally relevant interventions.',
-      slug:'community-development',
-      points:['Community-led initiatives','Human-capital development','Longer-term empowerment']
-    }
-  ];
-
-  const programs = $derived(data.programs.length
-    ? data.programs.map((program, index) => ({
-        number: String(index + 1).padStart(2, '0'),
-        title: program.title,
-        copy: program.summary,
-        slug: program.slug,
-        points: program.body
-          ? program.body.split('\n').map((item) => item.trim()).filter(Boolean)
-          : []
-      }))
-    : fallbackPrograms);
+  const programs = $derived(
+    (data.programs.length ? data.programs : fallbackPrograms).map((program, index) => ({
+      number: String(index + 1).padStart(2, '0'),
+      title: program.title,
+      copy: program.summary,
+      slug: program.slug,
+      points: fallbackPrograms.find((item) => item.slug === program.slug)?.points ?? []
+    }))
+  );
 </script>
 
 <PageHero
