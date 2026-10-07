@@ -56,8 +56,13 @@
   <div class="container founder-grid">
     <div class="portrait">
       <div class="portrait-inner">
-        <span class="crown">♛</span>
-        <p>Founder portrait</p>
+        <img
+          src="/brand/queen.png"
+          alt="Princess Dr. Jessie Joseph, Founder of Queen Tovah Cares Foundation International"
+          width="941"
+          height="1671"
+          loading="lazy"
+        />
       </div>
     </div>
     <div>
@@ -92,9 +97,8 @@
   .founder { background:#f7efe2; color:#33232f; }
   .founder-grid { display:grid; grid-template-columns:.8fr 1.2fr; align-items:center; gap:80px; }
   .portrait { min-height:520px; border-radius:30px; padding:28px; background:linear-gradient(145deg,#4b1551,#100611); box-shadow:0 26px 70px rgba(60,30,50,.2); }
-  .portrait-inner { height:100%; min-height:464px; display:grid; place-items:center; position:relative; border:1px solid rgba(225,189,106,.35); border-radius:45% 45% 18px 18px; color:#bdaebc; text-align:center; }
-  .portrait-inner p { max-width:220px; }
-  .crown { position:absolute; top:42px; color:var(--gold-bright); font-size:3.5rem; }
+  .portrait-inner { height:100%; min-height:464px; display:grid; place-items:center; position:relative; border:1px solid rgba(225,189,106,.35); border-radius:45% 45% 18px 18px; overflow:hidden; color:#bdaebc; text-align:center; }
+  .portrait-inner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 12%; border-radius:inherit; }
   .reported-name { margin:18px 0 0; color:#8e6020; font-size:.9rem; }
   .reported-name a { text-decoration:underline; text-underline-offset:3px; }
   .founder-copy { max-width:700px; margin:26px 0 0; color:#695966; }

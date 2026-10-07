@@ -115,18 +115,11 @@
   <div class="container profile-grid">
     <aside class="portrait-card">
       <div class="portrait-frame">
-        {#if founder?.portrait}
-          <img src={founder.portrait} alt={founder.portrait_alt || founder.public_record_name || founder.primary_name} />
-        {:else}
-          <span class="crown">♛</span>
-          <strong>{founder?.public_record_name || 'Princess Dr. Jessie Ifeoma Udoka-Menuba'}</strong>
-          <small>{founder?.headline || 'Founder / CEO — public record'}</small>
-        {/if}
+        <img
+          src={founder?.portrait || '/brand/queen.png'}
+          alt={founder?.portrait_alt || `${founder?.public_record_name || 'Princess Dr. Jessie Ifeoma Udoka-Menuba'}, Founder of Queen Tovah Cares Foundation International`}
+        />
       </div>
-      <p>
-        Official coverage contains photographs of Dr. Udoka-Menuba. A Foundation-approved portrait will
-        replace this panel once the image is cleared for permanent use on the website.
-      </p>
       <a
         class="source-link"
         href="https://anambrastate.gov.ng/ugosimba-women-amawbia-honor-princess-dr-jessie-ifeoma-udoka-menuba-with-prestigious-mother-general-award/"
@@ -271,13 +264,9 @@
   .profile { padding:112px 0; background:var(--ivory); color:#2b1827; }
   .profile-grid { display:grid; grid-template-columns:.8fr 1.2fr; gap:84px; align-items:center; }
   .portrait-card { border-radius:30px; padding:28px; background:linear-gradient(145deg,#4b1551,#100611); box-shadow:0 30px 80px rgba(53,28,46,.18); }
-  .portrait-frame { min-height:500px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; position:relative; border:1px solid rgba(225,189,106,.35); border-radius:46% 46% 22px 22px; padding:30px; text-align:center; }
-  .portrait-frame .crown { position:absolute; top:42px; color:var(--gold-bright); font-size:3.5rem; }
-  .portrait-frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
-  .portrait-frame strong { max-width:270px; margin-top:48px; color:var(--champagne); font:600 2rem/1.05 'Cormorant Garamond',Georgia,serif; }
-  .portrait-frame small { color:#aa96a8; }
-  .portrait-card>p { color:#c5b5c3; font-size:.82rem; }
-  .source-link { color:var(--gold-bright); font-size:.82rem; text-decoration:underline; text-underline-offset:3px; }
+  .portrait-frame { min-height:500px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; position:relative; overflow:hidden; border:1px solid rgba(225,189,106,.35); border-radius:46% 46% 22px 22px; padding:30px; text-align:center; }
+  .portrait-frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 12%; border-radius:inherit; }
+  .source-link { display:inline-block; margin-top:18px; color:var(--gold-bright); font-size:.82rem; text-decoration:underline; text-underline-offset:3px; }
   .bio .eyebrow { color:#8e6020; }
   .bio .section-title { color:#321c2f; }
   .bio>p:not(.eyebrow) { color:#685764; }

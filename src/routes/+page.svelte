@@ -396,8 +396,14 @@
   <div class="container founder-grid">
     <div class="founder-portrait card">
       <div class="portrait-frame">
-        <div class="portrait-crown">♛</div>
-        <span>Founder portrait</span>
+        <img
+          class="portrait-photo"
+          src="/brand/queen.png"
+          alt="Princess Dr. Jessie Joseph, Founder of Queen Tovah Cares Foundation International"
+          width="941"
+          height="1671"
+          loading="lazy"
+        />
       </div>
       <p>Princess Dr. Jessie Joseph</p>
     </div>
@@ -1241,16 +1247,20 @@
     place-items: center;
     border: 1px solid rgba(225, 189, 106, 0.38);
     border-radius: 46% 46% 18px 18px;
+    overflow: hidden;
     color: rgba(240, 221, 173, 0.66);
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 1.1rem;
   }
 
-  .portrait-crown {
+  .portrait-photo {
     position: absolute;
-    top: 38px;
-    color: var(--gold-bright);
-    font-size: 3.6rem;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 12%;
+    border-radius: inherit;
   }
 
   .founder-portrait > p {
