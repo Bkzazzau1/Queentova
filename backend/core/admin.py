@@ -5,6 +5,8 @@ from django.utils import timezone
 from .models import (
     Announcement,
     Campaign,
+    CampaignUpdate,
+    CampaignUpdateMedia,
     ContactSubmission,
     Event,
     FAQ,
@@ -246,6 +248,115 @@ class CampaignAdmin(PublishWorkflowAdmin):
     list_filter = ("status", "featured", "accepting_support", "currency")
     search_fields = ("title", "summary", "body")
     prepopulated_fields = {"slug": ("title",)}
+
+
+class CampaignUpdateMediaInline(admin.TabularInline):
+    model = CampaignUpdateMedia
+    extra = 0
+    fields = (
+        "media_type", "image", "file", "external_url", "alt_text",
+        "caption", "credit", "source_url", "reuse_approved",
+        "featured", "display_order",
+    )
+
+
+@admin.register(CampaignUpdate)
+class CampaignUpdateAdmin(PublishWorkflowAdmin):
+    list_display = (
+        "title", "kind", "campaign", "program", "occurred_at",
+        "expenditure_verified", "featured", "status",
+    )
+    list_filter = (
+        "status", "kind", "featured", "expenditure_verified",
+        "campaign", "program",
+    )
+    search_fields = (
+        "title", "summary", "body", "location_label",
+        "campaign__title", "program__title", "verification_note",
+        "source_reference",
+    )
+    prepopulated_fields = {"slug": ("title",)}
+    date_hierarchy = "occurred_at"
+    inlines = [CampaignUpdateMediaInline]
+    actions = ["move_to_review", "publish_selected", "return_to_draft"]
+    fieldsets = (
+        (
+            "Activity update",
+            {
+                "fields": (
+                    "title", "slug", "campaign", "program", "kind",
+                    "summary", "body", "occurred_at", "location_label",
+                    "featured", "video_url", "display_order",
+                )
+            },
+        ),
+        (
+            "Verified expenditure",
+            {
+                "fields": (
+                    "expenditure_amount", "expenditure_currency",
+                    "expenditure_note", "expenditure_verified",
+                )
+            },
+        ),
+        (
+            "Reported output",
+            {
+                "fields": (
+                    "output_value", "output_unit", "output_note",
+                )
+            },
+        ),
+        (
+            "Verification & source",
+            {
+                "fields": (
+                    "verification_note", "source_reference", "source_url",
+                )
+            },
+        ),
+        (
+            "Publishing & SEO",
+            {
+                "fields": (
+                    "status", "published_at", "seo_title",
+                    "seo_description", "seo_keywords", "og_image",
+                    "created_at", "updated_at",
+                )
+            },
+        ),
+    )
+
+    @admin.action(description="Publish selected updates after verification checks")
+    def publish_selected(self, request, queryset):
+        published = 0
+        rejected = []
+
+        for obj in queryset:
+            obj.status = obj.PublicationStatus.PUBLISHED
+            if not obj.published_at:
+                obj.published_at = timezone.now()
+            try:
+                obj.full_clean()
+            except ValidationError as exc:
+                rejected.append(f"{obj.title}: {exc.message_dict}")
+                continue
+            obj.save()
+            published += 1
+
+        if published:
+            self.message_user(
+                request,
+                f"{published} activity update{'s' if published != 1 else ''} published.",
+                level=messages.SUCCESS,
+            )
+        if rejected:
+            self.message_user(
+                request,
+                "Not published because verification requirements were incomplete: "
+                + " | ".join(rejected),
+                level=messages.WARNING,
+            )
 
 
 @admin.register(Event)
