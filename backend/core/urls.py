@@ -12,6 +12,7 @@ from .views import (
     GalleryItemViewSet,
     HomepageSpotlightViewSet,
     ImpactMetricViewSet,
+    ImpactStoryViewSet,
     NewsletterSubscribeView,
     PartnerViewSet,
     ProgramViewSet,
@@ -34,6 +35,7 @@ router.register("homepage-spotlights", HomepageSpotlightViewSet, basename="homep
 router.register("founders", FounderProfileViewSet, basename="founder")
 router.register("founder-achievements", FounderAchievementViewSet, basename="founder-achievement")
 router.register("impact", ImpactMetricViewSet, basename="impact")
+router.register("impact-stories", ImpactStoryViewSet, basename="impact-story")
 router.register("scholarships", ScholarshipViewSet, basename="scholarship")
 router.register("partners", PartnerViewSet, basename="partner")
 router.register("resources", ResourceViewSet, basename="resource")
