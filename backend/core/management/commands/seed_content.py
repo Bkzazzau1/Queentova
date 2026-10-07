@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from core.models import FAQ, FounderAchievement, FounderMediaItem, FounderProfile, HomepageSpotlight, Program, SiteProfile, Story
+from core.models import CampaignUpdate, FAQ, FounderAchievement, FounderMediaItem, FounderProfile, HomepageSpotlight, Program, SiteProfile, Story
 
 
 class Command(BaseCommand):
@@ -282,6 +282,37 @@ class Command(BaseCommand):
                     **published,
                 },
             )
+
+
+        youth_program = Program.objects.get(slug="youth-sports")
+        CampaignUpdate.objects.update_or_create(
+            slug="amawbia-august-league-2025-field-update",
+            defaults={
+                "title": "Amawbia August League youth engagement update",
+                "program": youth_program,
+                "kind": "milestone",
+                "summary": (
+                    "Independent Newspaper Nigeria reported the Foundation's sponsorship of the "
+                    "2025 Amawbia August League football tournament as part of youth empowerment "
+                    "and community-development efforts."
+                ),
+                "body": (
+                    "The activity journal records this as a source-linked program milestone. "
+                    "No expenditure or beneficiary figure is published here because the current "
+                    "public source does not provide a verified figure suitable for this website."
+                ),
+                "occurred_at": timezone.make_aware(datetime(2025, 8, 15, 12, 0)),
+                "location_label": "Amawbia, Anambra State",
+                "featured": True,
+                "verification_note": (
+                    "Public activity record linked to Independent Newspaper Nigeria coverage."
+                ),
+                "source_reference": "Independent Newspaper Nigeria — Amawbia football showdown",
+                "source_url": "https://independent.ng/princess-udoka-menuba-kicks-poverty-out-with-amawbia-football-showdown/",
+                "display_order": 1,
+                **published,
+            },
+        )
 
         HomepageSpotlight.objects.update_or_create(
             slug="amawbia-youth-sports-spotlight",
