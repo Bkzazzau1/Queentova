@@ -56,10 +56,12 @@ class StorySerializer(serializers.ModelSerializer):
 
 
 class GalleryItemSerializer(serializers.ModelSerializer):
+    program = serializers.SlugRelatedField(slug_field="slug", read_only=True)
+
     class Meta:
         model = GalleryItem
         fields = [
-            "title", "slug", "media_type", "image", "video_url", "alt_text",
+            "title", "slug", "program", "media_type", "image", "video_url", "alt_text",
             "caption", "category", "event_date", "published_at",
         ]
 

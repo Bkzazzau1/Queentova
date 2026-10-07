@@ -85,10 +85,17 @@ class StoryViewSet(PublishedReadOnlyViewSet):
 
 
 class GalleryItemViewSet(PublishedReadOnlyViewSet):
-    queryset = GalleryItem.objects.all()
+    queryset = GalleryItem.objects.select_related("program").all()
     serializer_class = GalleryItemSerializer
     search_fields = ["title", "caption", "category"]
     ordering_fields = ["display_order", "event_date", "published_at"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        program_slug = self.request.query_params.get("program", "").strip()
+        if program_slug:
+            queryset = queryset.filter(program__slug=program_slug)
+        return queryset
 
 
 class FounderProfileViewSet(PublishedReadOnlyViewSet):

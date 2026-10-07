@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 class PublishableModel(models.Model):
@@ -87,7 +88,15 @@ class GalleryItem(PublishableModel):
         VIDEO = "video", "Video"
 
     title = models.CharField(max_length=180)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="gallery_items",
+        help_text="Show this photo or video in the gallery on the selected program page.",
+    )
     media_type = models.CharField(max_length=12, choices=MediaType.choices, default=MediaType.IMAGE)
     image = models.ImageField(upload_to="gallery/%Y/%m/", blank=True, null=True)
     video_url = models.URLField(blank=True)
@@ -102,6 +111,15 @@ class GalleryItem(PublishableModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title)[:180] or "gallery-item"
+            slug, n = base, 2
+            while GalleryItem.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug, n = f"{base}-{n}", n + 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 
 class FounderProfile(PublishableModel):

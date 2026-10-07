@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, ContactSubmission, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, Scholarship, ScholarshipApplication, ScholarshipApplicationDocument, Story, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, GalleryItem, CampaignUpdate, CampaignUpdateMedia, ContactSubmission, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, Scholarship, ScholarshipApplication, ScholarshipApplicationDocument, Story, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -43,6 +43,26 @@ class PublicApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         titles = [item["title"] for item in response.data["results"]]
         self.assertEqual(titles, ["Published Program"])
+
+    def test_gallery_api_filters_by_program_and_hides_drafts(self):
+        program = Program.objects.get(slug="published-program")
+        GalleryItem.objects.create(title="Food drive", program=program, status="published")
+        GalleryItem.objects.create(title="Draft photo", program=program, status="draft")
+        GalleryItem.objects.create(title="Unlinked photo", status="published")
+
+        response = self.client.get("/api/v1/gallery/?program=published-program")
+
+        self.assertEqual(response.status_code, 200)
+        results = response.json()["results"]
+        self.assertEqual([item["title"] for item in results], ["Food drive"])
+        self.assertEqual(results[0]["program"], "published-program")
+
+    def test_gallery_item_slug_is_generated_and_unique(self):
+        first = GalleryItem.objects.create(title="Community visit")
+        second = GalleryItem.objects.create(title="Community visit")
+
+        self.assertEqual(first.slug, "community-visit")
+        self.assertEqual(second.slug, "community-visit-2")
 
     def test_campaign_api_exposes_only_published_content(self):
         response = self.client.get("/api/v1/campaigns/")

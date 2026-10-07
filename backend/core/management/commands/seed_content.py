@@ -33,39 +33,80 @@ class Command(BaseCommand):
             (
                 "Humanitarian Support",
                 "humanitarian-support",
-                "Practical care for vulnerable people and families, with dignity at the centre of every intervention.",
+                (
+                    "Global outreach for the downtrodden and less privileged, including widows and "
+                    "widowers, indigent people, the homeless and families facing hardship."
+                ),
+                (
+                    "Official Anambra State Government coverage describes Queen Tovah Cares Foundation "
+                    "International as a foundation \"with global outreach that looks toward the plights of "
+                    "the downtrodden, the less privileged and is not politically motivated\".\n\n"
+                    "Its humanitarian mission includes helping widows and widowers, indigent people and "
+                    "the homeless, including financial help to families facing hardship.\n\n"
+                    "The Founder has made clear that this philanthropy is not limited to Anambra or "
+                    "Amawbia, but extends to any part of Nigeria and the world."
+                ),
                 "heart",
                 1,
             ),
             (
                 "Education & Scholarships",
                 "education-scholarships",
-                "Opening doors to learning for indigent students and people whose potential should not be limited by circumstance.",
+                (
+                    "Scholarship awards for indigent people, so that financial hardship does not become "
+                    "a permanent barrier to education."
+                ),
+                (
+                    "The Foundation sponsors scholarship awards for indigent people, opening doors to "
+                    "learning for those whose potential should not be limited by circumstance.\n\n"
+                    "Education is part of the Foundation's wider investment in human capital: helping "
+                    "people build the knowledge and confidence to shape stronger futures for themselves "
+                    "and their communities."
+                ),
                 "book",
                 2,
             ),
             (
                 "Youth Empowerment & Sports",
                 "youth-sports",
-                "Using sport, mentorship and shared experiences to bring young people together and strengthen communities.",
+                (
+                    "Using sport to promote unity and engage young people, including sponsorship of the "
+                    "2025 Amawbia August League football tournament in Anambra State."
+                ),
+                (
+                    "The Foundation uses sport to bring young people together, encourage constructive "
+                    "engagement and strengthen community bonds.\n\n"
+                    "In 2025 it sponsored the Amawbia August League football tournament to promote sports "
+                    "and unite youths in Anambra State."
+                ),
                 "spark",
                 3,
             ),
             (
-                "Community Development",
+                "Human Capital & Community Development",
                 "community-development",
-                "Supporting human capital and community-led progress through initiatives designed around real local needs.",
+                (
+                    "Recognised for work in human capital and community development, investing in people "
+                    "as the foundation of stronger communities."
+                ),
+                (
+                    "The Foundation has been recognised for its work in human capital and community "
+                    "development, investing in people as the foundation of stronger communities.\n\n"
+                    "Its support is shaped around real local needs and guided by the Founder's "
+                    "principles: \"It is good to be good\" and \"God is my strength\"."
+                ),
                 "people",
                 4,
             ),
         ]
 
-        for title, slug, summary, icon, order in programs:
+        for title, slug, summary, body, icon, order in programs:
             Program.objects.update_or_create(
                 slug=slug,
                 defaults={
                     "title": title,
                     "summary": summary,
+                    "body": body,
                     "icon": icon,
                     "display_order": order,
                     "featured": True,

@@ -173,18 +173,16 @@
     <div class="about-copy">
       <p>
         Queen Tovah Cares Foundation International is a philanthropic foundation founded by
-        <strong>Princess Dr. Jessie Joseph</strong>. Official public coverage of the Foundation also identifies
-        <strong>Princess Dr. Jessie Ifeoma Udoka-Menuba (née Oliobi)</strong> as Founder/CEO. Until the
-        Foundation formally confirms how these names should be presented together, the website keeps
-        the public-record name visible for discoverability without replacing the primary founder name
-        supplied for the site. Its work is centred on people who are too often
-        overlooked: widows and widowers, indigent families, the homeless, young people and communities
-        needing meaningful support.
+        <strong>Princess Dr. Jessie Joseph</strong>, with a global outreach that looks toward the plight of
+        the downtrodden and the less privileged, and is not politically motivated. Its work is centred on
+        people who are too often overlooked: widows and widowers, indigent families, the homeless, young
+        people and communities needing meaningful support.
       </p>
       <p>
         The Foundation combines direct humanitarian assistance with longer-term investment in human
-        potential — from scholarships and education to sports, youth engagement and community
-        development.
+        potential — from scholarship awards for indigent people to sports, youth engagement and community
+        development. Its philanthropy is not limited to Anambra or Amawbia, but extends to any part of
+        Nigeria and the world.
       </p>
     </div>
   </div>

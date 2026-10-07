@@ -51,12 +51,34 @@ class PublishWorkflowAdmin(admin.ModelAdmin):
         queryset.update(status="draft")
 
 
+class ProgramGalleryInline(admin.TabularInline):
+    model = GalleryItem
+    extra = 1
+    verbose_name = "Gallery photo or video"
+    verbose_name_plural = "Program gallery"
+    fields = (
+        "title", "media_type", "image", "video_url", "alt_text",
+        "caption", "event_date", "status", "display_order",
+    )
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        # Photos added from a program page go live with it unless set otherwise.
+        if db_field.name == "status":
+            kwargs["initial"] = GalleryItem.PublicationStatus.PUBLISHED
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
+
 @admin.register(Program)
 class ProgramAdmin(PublishWorkflowAdmin):
-    list_display = ("title", "status", "featured", "display_order", "updated_at")
+    list_display = ("title", "status", "featured", "gallery_count", "display_order", "updated_at")
     list_filter = ("status", "featured")
     search_fields = ("title", "summary", "body")
     prepopulated_fields = {"slug": ("title",)}
+    inlines = [ProgramGalleryInline]
+
+    @admin.display(description="Gallery items")
+    def gallery_count(self, obj):
+        return obj.gallery_items.count()
 
 
 @admin.register(Story)
@@ -70,8 +92,8 @@ class StoryAdmin(PublishWorkflowAdmin):
 
 @admin.register(GalleryItem)
 class GalleryItemAdmin(PublishWorkflowAdmin):
-    list_display = ("title", "media_type", "category", "event_date", "status", "display_order")
-    list_filter = ("status", "media_type", "category")
+    list_display = ("title", "program", "media_type", "category", "event_date", "status", "display_order")
+    list_filter = ("status", "program", "media_type", "category")
     search_fields = ("title", "caption", "alt_text")
     prepopulated_fields = {"slug": ("title",)}
 

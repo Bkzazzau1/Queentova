@@ -1,7 +1,8 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
+  import ProgramGallery from '$lib/components/ProgramGallery.svelte';
   let { data } = $props();
-  const { program, updates } = $derived(data);
+  const { program, updates, gallery } = $derived(data);
 
   const updateLabels: Record<string,string> = {
     field: 'Field update',
@@ -31,7 +32,7 @@
   <div class="container detail-grid">
     <aside>
       <span class="icon">{program.icon === 'heart' ? '♡' : program.icon === 'book' ? '◫' : program.icon === 'spark' ? '✦' : '◉'}</span>
-      <p>Managed and published through the Queen Tovah Foundation administration system.</p>
+      <p>Want to support, partner on or learn more about this program? The Foundation team would be glad to hear from you.</p>
       <a class="btn btn-primary" href="/contact">Enquire about this program</a>
     </aside>
     <div class="body">
@@ -45,6 +46,8 @@
     </div>
   </div>
 </section>
+
+<ProgramGallery items={gallery} programTitle={program.title} />
 
 {#if updates.length}
 <section class="program-journal">

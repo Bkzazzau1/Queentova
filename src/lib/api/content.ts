@@ -36,6 +36,7 @@ export interface Story {
 export interface GalleryItem {
   title: string;
   slug: string;
+  program: string | null;
   media_type: 'image' | 'video';
   image: string | null;
   video_url: string;
