@@ -414,6 +414,171 @@ class Campaign(PublishableModel):
         return self.title
 
 
+class CampaignUpdate(PublishableModel):
+    class Kind(models.TextChoices):
+        FIELD = "field", "Field update"
+        MILESTONE = "milestone", "Milestone"
+        DELIVERY = "delivery", "Delivery / distribution"
+        FUNDING = "funding", "Funding update"
+        IMPACT = "impact", "Impact update"
+        ANNOUNCEMENT = "announcement", "Announcement"
+
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    campaign = models.ForeignKey(
+        Campaign,
+        related_name="activity_updates",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    program = models.ForeignKey(
+        Program,
+        related_name="activity_updates",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.FIELD)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    occurred_at = models.DateTimeField(db_index=True)
+    location_label = models.CharField(max_length=180, blank=True)
+    featured = models.BooleanField(default=False)
+    video_url = models.URLField(blank=True)
+
+    expenditure_amount = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    expenditure_currency = models.CharField(max_length=8, default="USD")
+    expenditure_note = models.CharField(max_length=260, blank=True)
+    expenditure_verified = models.BooleanField(default=False)
+
+    output_value = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    output_unit = models.CharField(max_length=120, blank=True)
+    output_note = models.CharField(max_length=260, blank=True)
+
+    verification_note = models.TextField(blank=True)
+    source_reference = models.CharField(max_length=260, blank=True)
+    source_url = models.URLField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-occurred_at", "-published_at", "title"]
+        verbose_name = "Campaign / program update"
+        verbose_name_plural = "Campaign & program activity journal"
+
+    def __str__(self):
+        return self.title
+
+    def clean(self):
+        errors = {}
+
+        if not self.campaign_id and not self.program_id:
+            errors["campaign"] = "Link this update to a campaign, a program, or both."
+
+        if self.expenditure_verified and self.expenditure_amount is None:
+            errors["expenditure_amount"] = (
+                "A verified expenditure update must include the expenditure amount."
+            )
+
+        if self.output_value is not None and not self.output_unit.strip():
+            errors["output_unit"] = "Add a unit for the reported output."
+
+        if self.status == self.PublicationStatus.PUBLISHED:
+            if self.expenditure_amount is not None and not self.expenditure_verified:
+                errors["expenditure_verified"] = (
+                    "Financial expenditure cannot be published until it is verified."
+                )
+            if self.expenditure_amount is not None and not self.verification_note.strip():
+                errors["verification_note"] = (
+                    "Add a verification note before publishing financial expenditure."
+                )
+
+        if errors:
+            raise ValidationError(errors)
+
+
+class CampaignUpdateMedia(models.Model):
+    class MediaType(models.TextChoices):
+        PHOTO = "photo", "Photo"
+        DOCUMENT = "document", "Document"
+
+    update = models.ForeignKey(
+        CampaignUpdate,
+        related_name="media",
+        on_delete=models.CASCADE,
+    )
+    media_type = models.CharField(
+        max_length=12,
+        choices=MediaType.choices,
+        default=MediaType.PHOTO,
+    )
+    image = models.ImageField(
+        upload_to="campaign-updates/%Y/%m/",
+        blank=True,
+        null=True,
+    )
+    file = models.FileField(
+        upload_to="campaign-updates/documents/%Y/%m/",
+        blank=True,
+        null=True,
+    )
+    external_url = models.URLField(max_length=900, blank=True)
+    alt_text = models.CharField(max_length=240, blank=True)
+    caption = models.TextField(blank=True)
+    credit = models.CharField(max_length=220, blank=True)
+    source_url = models.URLField(max_length=600, blank=True)
+    reuse_approved = models.BooleanField(
+        default=False,
+        help_text="Required for externally sourced media before public display.",
+    )
+    featured = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "-featured", "id"]
+        verbose_name = "Activity update media"
+        verbose_name_plural = "Activity update media"
+
+    def __str__(self):
+        return f"{self.update.title} — {self.get_media_type_display()}"
+
+    def clean(self):
+        errors = {}
+
+        sources = [
+            bool(self.image),
+            bool(self.file),
+            bool(self.external_url.strip()),
+        ]
+        if sum(sources) != 1:
+            errors["image"] = "Provide exactly one media source: image, file, or external URL."
+
+        if self.external_url and not self.reuse_approved:
+            errors["reuse_approved"] = (
+                "External media must be approved for reuse before publication."
+            )
+
+        if self.media_type == self.MediaType.PHOTO and self.file:
+            errors["file"] = "Photo media should use an image or approved external URL."
+
+        if self.media_type == self.MediaType.DOCUMENT and self.image:
+            errors["image"] = "Document media should use a file or approved external URL."
+
+        if errors:
+            raise ValidationError(errors)
+
+
 class Event(PublishableModel):
     title = models.CharField(max_length=220)
     slug = models.SlugField(max_length=240, unique=True)
