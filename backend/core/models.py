@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -133,6 +134,126 @@ class FounderAchievement(PublishableModel):
 
     def __str__(self):
         return self.title
+
+
+class ImpactStory(PublishableModel):
+    class ConsentStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACTIVE = "active", "Active"
+        WITHDRAWN = "withdrawn", "Withdrawn"
+
+    class IdentityMode(models.TextChoices):
+        ANONYMOUS = "anonymous", "Identity protected"
+        FIRST_NAME = "first-name", "Approved first name"
+        APPROVED_NAME = "approved-name", "Approved public name"
+
+    class AgeGroup(models.TextChoices):
+        NOT_STATED = "not-stated", "Not stated"
+        CHILD = "child", "Child"
+        YOUTH = "youth", "Youth"
+        ADULT = "adult", "Adult"
+        OLDER_ADULT = "older-adult", "Older adult"
+
+    class ProgramArea(models.TextChoices):
+        HUMANITARIAN = "humanitarian", "Humanitarian support"
+        EDUCATION = "education", "Education & scholarships"
+        YOUTH = "youth", "Youth & sports"
+        COMMUNITY = "community", "Community development"
+        LIVELIHOOD = "livelihood", "Livelihood & empowerment"
+        OTHER = "other", "Other"
+
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    excerpt = models.TextField()
+    body = models.TextField()
+    program_area = models.CharField(
+        max_length=20,
+        choices=ProgramArea.choices,
+        default=ProgramArea.HUMANITARIAN,
+    )
+    identity_mode = models.CharField(
+        max_length=20,
+        choices=IdentityMode.choices,
+        default=IdentityMode.ANONYMOUS,
+    )
+    approved_display_name = models.CharField(max_length=120, blank=True)
+    age_group = models.CharField(
+        max_length=20,
+        choices=AgeGroup.choices,
+        default=AgeGroup.NOT_STATED,
+    )
+    location_label = models.CharField(
+        max_length=160,
+        blank=True,
+        help_text="Use only a broad approved location, such as city/state/country.",
+    )
+    image = models.ImageField(upload_to="impact-stories/%Y/%m/", blank=True, null=True)
+    image_alt = models.CharField(max_length=220, blank=True)
+    quote = models.TextField(blank=True)
+    quote_attribution = models.CharField(max_length=120, blank=True)
+    featured = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+
+    consent_status = models.CharField(
+        max_length=12,
+        choices=ConsentStatus.choices,
+        default=ConsentStatus.PENDING,
+        db_index=True,
+    )
+    story_consent = models.BooleanField(default=False)
+    photo_consent = models.BooleanField(default=False)
+    quote_consent = models.BooleanField(default=False)
+    privacy_reviewed = models.BooleanField(default=False)
+    is_minor = models.BooleanField(default=False)
+    guardian_consent = models.BooleanField(default=False)
+    consent_reference = models.CharField(
+        max_length=160,
+        blank=True,
+        help_text="Internal reference only. Never exposed through the public API.",
+    )
+    consent_recorded_at = models.DateTimeField(blank=True, null=True)
+    consent_withdrawn_at = models.DateTimeField(blank=True, null=True)
+    consent_review_note = models.TextField(
+        blank=True,
+        help_text="Internal privacy/consent review notes. Never exposed publicly.",
+    )
+
+    class Meta:
+        ordering = ["display_order", "-published_at", "title"]
+        verbose_name = "Impact story"
+        verbose_name_plural = "Impact stories"
+
+    def __str__(self):
+        return self.title
+
+    def clean(self):
+        errors = {}
+
+        if self.identity_mode != self.IdentityMode.ANONYMOUS and not self.approved_display_name.strip():
+            errors["approved_display_name"] = "An approved public display name is required for this identity mode."
+
+        if self.image and not self.photo_consent:
+            errors["photo_consent"] = "Photo consent is required before an image can be attached to this story."
+
+        if self.quote and not self.quote_consent:
+            errors["quote_consent"] = "Quote consent is required before a beneficiary quote can be published."
+
+        if self.status == self.PublicationStatus.PUBLISHED:
+            if self.consent_status != self.ConsentStatus.ACTIVE:
+                errors["consent_status"] = "Active consent is required before publication."
+            if not self.story_consent:
+                errors["story_consent"] = "Story publication consent is required."
+            if not self.privacy_reviewed:
+                errors["privacy_reviewed"] = "A privacy review is required before publication."
+            if not self.consent_recorded_at:
+                errors["consent_recorded_at"] = "Record when consent was obtained before publication."
+            if not self.consent_reference.strip():
+                errors["consent_reference"] = "An internal consent reference is required before publication."
+            if self.is_minor and not self.guardian_consent:
+                errors["guardian_consent"] = "Guardian consent is required for a minor."
+
+        if errors:
+            raise ValidationError(errors)
 
 
 class ImpactMetric(PublishableModel):
