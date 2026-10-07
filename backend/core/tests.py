@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, FAQ, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -261,3 +261,62 @@ class PublicApiTests(TestCase):
 
         with self.assertRaises(ValidationError):
             story.full_clean()
+
+
+    def test_founder_media_api_keeps_unapproved_external_photos_private(self):
+        item = FounderMediaItem.objects.create(
+            title="Verified award coverage",
+            slug="verified-award-coverage",
+            kind="award",
+            summary="A verified source-linked recognition.",
+            source_name="Anambra State Government",
+            source_url="https://anambrastate.gov.ng/example/",
+            source_domain="anambrastate.gov.ng",
+            verified_source=True,
+            status="published",
+        )
+        FounderMediaPhoto.objects.create(
+            media_item=item,
+            external_image_url="https://anambrastate.gov.ng/wp-content/uploads/example.jpg",
+            alt_text="Candidate publication photograph",
+            credit="Anambra State Government",
+            source_url=item.source_url,
+            reuse_approved=False,
+            is_primary=True,
+        )
+
+        response = self.client.get("/api/v1/founder-media/verified-award-coverage/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["source_url"], item.source_url)
+        self.assertTrue(response.data["verified_source"])
+        self.assertEqual(response.data["photos"], [])
+
+    def test_founder_media_api_exposes_approved_external_photo(self):
+        item = FounderMediaItem.objects.create(
+            title="Approved media photo",
+            slug="approved-media-photo",
+            kind="news",
+            summary="A publication with an approved source image.",
+            source_name="Independent Newspaper Nigeria",
+            source_url="https://independent.ng/example/",
+            source_domain="independent.ng",
+            verified_source=True,
+            status="published",
+        )
+        FounderMediaPhoto.objects.create(
+            media_item=item,
+            external_image_url="https://independent.ng/wp-content/uploads/example.jpg",
+            alt_text="Approved publication photograph",
+            credit="Independent Newspaper Nigeria",
+            source_url=item.source_url,
+            reuse_approved=True,
+            is_primary=True,
+        )
+
+        response = self.client.get("/api/v1/founder-media/approved-media-photo/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["photos"]), 1)
+        self.assertEqual(
+            response.data["photos"][0]["image_url"],
+            "https://independent.ng/wp-content/uploads/example.jpg",
+        )
