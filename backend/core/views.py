@@ -314,6 +314,17 @@ class SearchView(APIView):
                 "url": f"/causes/{item.slug}",
             })
 
+        for item in Scholarship.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) |
+            Q(eligibility__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "scholarship",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/scholarships/{item.slug}",
+            })
+
         for item in Partner.objects.filter(
             status=published,
             verified_relationship=True,
