@@ -9,6 +9,7 @@ from .models import (
     FounderAchievement,
     FounderProfile,
     GalleryItem,
+    HomepageSpotlight,
     ImpactMetric,
     NewsletterSubscriber,
     Partner,
@@ -214,4 +215,15 @@ class FAQSerializer(serializers.ModelSerializer):
         fields = [
             "question", "slug", "answer", "category", "featured",
             "display_order", "published_at",
+        ]
+
+
+class HomepageSpotlightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomepageSpotlight
+        fields = [
+            "eyebrow", "title", "slug", "summary", "image", "image_alt",
+            "link_label", "link_url", "secondary_label", "secondary_url",
+            "style", "starts_at", "ends_at", "priority", "display_order",
+            "published_at",
         ]
