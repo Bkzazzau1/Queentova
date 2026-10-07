@@ -376,11 +376,53 @@ class Scholarship(PublishableModel):
 
 
 class Partner(PublishableModel):
+    class PartnerType(models.TextChoices):
+        CORPORATE = "corporate", "Corporate"
+        NONPROFIT = "nonprofit", "Nonprofit / NGO"
+        GOVERNMENT = "government", "Government / public institution"
+        EDUCATION = "education", "Education / research"
+        MEDIA = "media", "Media"
+        COMMUNITY = "community", "Community organisation"
+        PROFESSIONAL = "professional", "Professional body"
+        OTHER = "other", "Other"
+
+    class RelationshipStatus(models.TextChoices):
+        STRATEGIC = "strategic", "Strategic partner"
+        ACTIVE = "active", "Active partner"
+        PROJECT = "project", "Project partner"
+        SUPPORTER = "supporter", "Supporter / sponsor"
+        COMPLETED = "completed", "Completed collaboration"
+
     title = models.CharField(max_length=180)
     slug = models.SlugField(max_length=200, unique=True)
+    partner_type = models.CharField(
+        max_length=20,
+        choices=PartnerType.choices,
+        default=PartnerType.OTHER,
+    )
+    relationship_status = models.CharField(
+        max_length=20,
+        choices=RelationshipStatus.choices,
+        default=RelationshipStatus.ACTIVE,
+    )
+    tagline = models.CharField(max_length=240, blank=True)
     description = models.TextField(blank=True)
+    body = models.TextField(blank=True)
     website = models.URLField(blank=True)
-    logo = models.ImageField(upload_to="partners/", blank=True, null=True)
+    logo = models.ImageField(upload_to="partners/logos/", blank=True, null=True)
+    hero_image = models.ImageField(upload_to="partners/hero/%Y/%m/", blank=True, null=True)
+    hero_alt = models.CharField(max_length=220, blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    relationship_since = models.DateField(blank=True, null=True)
+    relationship_ended = models.DateField(blank=True, null=True)
+    verified_relationship = models.BooleanField(default=False, db_index=True)
+    verification_note = models.TextField(
+        blank=True,
+        help_text="Internal/public-safe note explaining how the relationship was verified.",
+    )
+    reference_url = models.URLField(blank=True)
+    featured = models.BooleanField(default=False)
     display_order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -388,6 +430,87 @@ class Partner(PublishableModel):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        errors = {}
+
+        if self.relationship_ended and self.relationship_since and self.relationship_ended < self.relationship_since:
+            errors["relationship_ended"] = "Relationship end date cannot be before the start date."
+
+        if self.status == self.PublicationStatus.PUBLISHED:
+            if not self.verified_relationship:
+                errors["verified_relationship"] = "Verify the relationship before publishing this partner."
+            if not self.verification_note.strip():
+                errors["verification_note"] = "Add a verification note before publication."
+
+        if errors:
+            raise ValidationError(errors)
+
+
+class PartnerCollaboration(PublishableModel):
+    class CollaborationStatus(models.TextChoices):
+        PLANNED = "planned", "Planned"
+        ACTIVE = "active", "Active"
+        COMPLETED = "completed", "Completed"
+        ONGOING = "ongoing", "Ongoing"
+
+    partner = models.ForeignKey(
+        Partner,
+        related_name="collaborations",
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    program = models.ForeignKey(
+        Program,
+        related_name="partner_collaborations",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    campaign = models.ForeignKey(
+        "Campaign",
+        related_name="partner_collaborations",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    collaboration_status = models.CharField(
+        max_length=16,
+        choices=CollaborationStatus.choices,
+        default=CollaborationStatus.ACTIVE,
+    )
+    starts_at = models.DateField(blank=True, null=True)
+    ends_at = models.DateField(blank=True, null=True)
+    location_label = models.CharField(max_length=180, blank=True)
+    featured = models.BooleanField(default=False)
+    verified_record = models.BooleanField(default=False, db_index=True)
+    verification_note = models.TextField(blank=True)
+    source_url = models.URLField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-starts_at", "-published_at", "title"]
+
+    def __str__(self):
+        return f"{self.partner.title} — {self.title}"
+
+    def clean(self):
+        errors = {}
+
+        if self.ends_at and self.starts_at and self.ends_at < self.starts_at:
+            errors["ends_at"] = "Collaboration end date cannot be before its start date."
+
+        if self.status == self.PublicationStatus.PUBLISHED:
+            if not self.verified_record:
+                errors["verified_record"] = "Verify this collaboration record before publication."
+            if not self.verification_note.strip():
+                errors["verification_note"] = "Add a verification note before publication."
+
+        if errors:
+            raise ValidationError(errors)
 
 
 class Campaign(PublishableModel):
@@ -438,6 +561,11 @@ class CampaignUpdate(PublishableModel):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+    )
+    partners = models.ManyToManyField(
+        Partner,
+        related_name="activity_updates",
+        blank=True,
     )
     kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.FIELD)
     summary = models.TextField()
