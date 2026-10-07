@@ -193,10 +193,7 @@ def build_admin_dashboard_context(request):
                 review_status__in=active_scholarship_statuses
             ).count(),
             "hint": "Submitted through shortlisted",
-            "url": filtered_admin_url(
-                ScholarshipApplication,
-                review_status__in=",".join(active_scholarship_statuses),
-            ),
+            "url": admin_url(ScholarshipApplication),
             "tone": "gold",
         },
         {
