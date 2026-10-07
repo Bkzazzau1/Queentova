@@ -20,12 +20,12 @@
     source_url: ''
   };
 
-  const featured = data.stories.find((story) => story.featured) ?? data.stories[0] ?? fallbackStory;
-  const year = featured.event_date ? featured.event_date.slice(0, 4) : 'Foundation';
-  const category = featured.category
+  const featured = $derived(data.stories.find((story) => story.featured) ?? data.stories[0] ?? fallbackStory);
+  const year = $derived(featured.event_date ? featured.event_date.slice(0, 4) : 'Foundation');
+  const category = $derived(featured.category
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+    .join(' '));
 </script>
 
 <PageHero

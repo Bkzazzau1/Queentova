@@ -11,8 +11,8 @@
 
   let { data } = $props();
 
-  const featured = data.media.filter((item) => item.featured).slice(0, 3);
-  const feed = data.media;
+  const featured = $derived(data.media.filter((item) => item.featured).slice(0, 3));
+  const feed = $derived(data.media);
 
   const labels: Record<string,string> = {
     award: 'Award & recognition',

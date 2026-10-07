@@ -2,12 +2,12 @@
   import { page } from '$app/state';
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
-  const { event } = data;
+  const { event } = $derived(data);
 
-  const start = new Date(event.starts_at);
-  const date = new Intl.DateTimeFormat('en', { dateStyle:'full' }).format(start);
-  const time = new Intl.DateTimeFormat('en', { timeStyle:'short' }).format(start);
-  const location = [event.venue_name, event.city, event.country].filter(Boolean).join(' • ');
+  const start = $derived(new Date(event.starts_at));
+  const date = $derived(new Intl.DateTimeFormat('en', { dateStyle:'full' }).format(start));
+  const time = $derived(new Intl.DateTimeFormat('en', { timeStyle:'short' }).format(start));
+  const location = $derived([event.venue_name, event.city, event.country].filter(Boolean).join(' • '));
 
   const eventSchema = $derived(
     JSON.stringify({

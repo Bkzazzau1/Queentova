@@ -3,7 +3,7 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  const { partner, collaborations, activity } = data;
+  const { partner, collaborations, activity } = $derived(data);
 
   const typeLabels: Record<string,string> = {
     corporate: 'Corporate',

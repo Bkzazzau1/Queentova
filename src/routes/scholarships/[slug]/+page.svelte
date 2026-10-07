@@ -2,13 +2,13 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  const { scholarship } = data;
+  const { scholarship } = $derived(data);
 
-  const label = scholarship.application_status === 'open'
+  const label = $derived(scholarship.application_status === 'open'
     ? 'Applications open'
     : scholarship.application_status === 'upcoming'
       ? 'Upcoming opportunity'
-      : 'Applications closed';
+      : 'Applications closed');
 </script>
 
 <svelte:head>

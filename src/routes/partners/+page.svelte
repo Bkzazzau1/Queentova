@@ -30,8 +30,8 @@
     completed: 'Completed collaboration'
   };
 
-  const featured = data.partners.filter((item) => item.featured).slice(0, 3);
-  const partners = data.partners;
+  const featured = $derived(data.partners.filter((item) => item.featured).slice(0, 3));
+  const partners = $derived(data.partners);
 </script>
 
 <PageHero

@@ -2,7 +2,7 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  const { update } = data;
+  const { update } = $derived(data);
 
   const labels: Record<string,string> = {
     field: 'Field update',
@@ -13,8 +13,8 @@
     announcement: 'Announcement'
   };
 
-  const photos = update.media.filter((item) => item.media_type === 'photo' && item.url);
-  const documents = update.media.filter((item) => item.media_type === 'document' && item.url);
+  const photos = $derived(update.media.filter((item) => item.media_type === 'photo' && item.url));
+  const documents = $derived(update.media.filter((item) => item.media_type === 'document' && item.url));
 
   function money(value: string) {
     const number = Number(value);

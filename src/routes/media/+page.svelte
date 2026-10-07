@@ -11,11 +11,11 @@
 
   let { data } = $props();
 
-  const pressResources = data.resources.filter((item) =>
+  const pressResources = $derived(data.resources.filter((item) =>
     ['press-kit', 'annual-report', 'impact-report', 'publication'].includes(item.category)
-  );
-  const stories = data.stories.slice(0, 6);
-  const founderMedia = data.founderMedia.slice(0, 4);
+  ));
+  const stories = $derived(data.stories.slice(0, 6));
+  const founderMedia = $derived(data.founderMedia.slice(0, 4));
 
   function founderPhoto(item: (typeof data.founderMedia)[number]) {
     return item.photos.find((photo) => photo.is_primary && photo.image_url) ??

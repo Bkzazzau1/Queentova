@@ -58,7 +58,7 @@
     }
   ];
 
-  const achievements = data.achievements.length
+  const achievements = $derived(data.achievements.length
     ? data.achievements.map((achievement) => ({
         year: String(achievement.year ?? ''),
         title: achievement.title,
@@ -66,10 +66,10 @@
         source: achievement.source_name || 'Source',
         href: achievement.source_url
       }))
-    : fallbackAchievements;
+    : fallbackAchievements);
 
-  const founder = data.founder;
-  const mediaPreview = data.media.slice(0, 4);
+  const founder = $derived(data.founder);
+  const mediaPreview = $derived(data.media.slice(0, 4));
 
   function mediaPhoto(item: (typeof data.media)[number]) {
     return item.photos.find((photo) => photo.is_primary && photo.image_url) ??

@@ -15,7 +15,7 @@
       <h1>{title} {#if accent}<span>{accent}</span>{/if}</h1>
       <p class="copy">{copy}</p>
     </div>
-    <img src="/brand/queen-tovah-logo.webp" alt="" aria-hidden="true" />
+    <img src="/brand/queen-tovah-crest.webp" alt="" aria-hidden="true" width="260" height="196" />
   </div>
 </section>
 
@@ -74,9 +74,8 @@
 
   img {
     width: 100%;
-    border: 1px solid rgba(225, 189, 106, 0.25);
-    border-radius: 26px;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+    height: auto;
+    filter: drop-shadow(0 20px 40px rgba(201, 151, 63, 0.16));
   }
 
   @media (max-width: 820px) {
@@ -90,7 +89,7 @@
     }
 
     img {
-      width: min(260px, 74vw);
+      width: min(200px, 56vw);
     }
   }
 </style>

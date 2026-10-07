@@ -1,7 +1,7 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
-  const { resource } = data;
+  const { resource } = $derived(data);
 
   const labels: Record<string,string> = {
     'annual-report': 'Annual report',

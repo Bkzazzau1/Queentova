@@ -8,8 +8,8 @@
   let { data } = $props();
 
   const now = new Date();
-  const upcoming = data.events.filter((event) => new Date(event.starts_at) >= now);
-  const past = data.events.filter((event) => new Date(event.starts_at) < now).reverse();
+  const upcoming = $derived(data.events.filter((event) => new Date(event.starts_at) >= now));
+  const past = $derived(data.events.filter((event) => new Date(event.starts_at) < now).reverse());
 
   function parts(value: string) {
     const d = new Date(value);

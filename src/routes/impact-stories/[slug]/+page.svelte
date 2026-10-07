@@ -3,7 +3,7 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  const { story } = data;
+  const { story } = $derived(data);
 
   const labels: Record<string, string> = {
     humanitarian: 'Humanitarian support',
@@ -28,7 +28,7 @@
         name: 'Queen Tovah Cares Foundation International',
         logo: {
           '@type': 'ImageObject',
-          url: `${page.url.origin}/brand/queen-tovah-logo.webp`
+          url: `${page.url.origin}/brand/queen-tovah-icon.png`
         }
       }
     }).replace(/</g, '\\u003c')

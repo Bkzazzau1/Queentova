@@ -2,7 +2,7 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  const { item } = data;
+  const { item } = $derived(data);
 
   const label: Record<string,string> = {
     award: 'Award & recognition',
@@ -13,7 +13,7 @@
     community: 'Community appearance'
   };
 
-  const displayDate = item.event_date || item.publication_date;
+  const displayDate = $derived(item.event_date || item.publication_date);
 </script>
 
 <svelte:head>

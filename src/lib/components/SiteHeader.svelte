@@ -3,8 +3,8 @@
   import type { Announcement } from '$lib/api/content';
 
   let { announcement = null }: { announcement?: Announcement | null } = $props();
-  let open = false;
-  let announcementVisible = true;
+  let open = $state(false);
+  let announcementVisible = $state(true);
 
   onMount(() => {
     if (announcement?.dismissible) {
@@ -70,7 +70,7 @@
 
   <div class="container nav">
     <a class="brand" href="/" aria-label="Queen Tovah Cares Foundation International home">
-      <img class="brand-logo" src="/brand/queen-tovah-logo.webp" alt="" />
+      <img class="brand-logo" src="/brand/queen-tovah-crest.webp" alt="" width="260" height="196" />
       <span class="brand-copy">
         <strong>Queen Tovah</strong>
         <small>Cares Foundation International</small>
@@ -218,12 +218,10 @@
   }
 
   .brand-logo {
-    width: 58px;
-    height: 44px;
-    border: 1px solid rgba(225, 189, 106, 0.28);
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    width: auto;
+    height: 52px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 12px rgba(201, 151, 63, 0.18));
   }
 
   .brand-copy {
@@ -454,7 +452,7 @@
     }
 
     .brand-logo {
-      width: 52px;
+      height: 44px;
     }
   }
 </style>

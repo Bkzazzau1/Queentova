@@ -6,7 +6,7 @@
   } from '$lib/api/content';
 
   let { data } = $props();
-  const { scholarship } = data;
+  const { scholarship } = $derived(data);
 
   let busy = $state(false);
   let errorMessage = $state('');

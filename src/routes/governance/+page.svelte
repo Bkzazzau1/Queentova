@@ -11,9 +11,9 @@
 
   let { data } = $props();
 
-  const governanceResources = data.resources.filter((item) =>
+  const governanceResources = $derived(data.resources.filter((item) =>
     ['annual-report', 'impact-report', 'policy'].includes(item.category)
-  );
+  ));
 
   const commitments = [
     ['Dignity before publicity', 'Beneficiaries should never be reduced to promotional material. Public stories and media should respect privacy, consent and human dignity.'],

@@ -13,7 +13,7 @@
   import PageHero from '$lib/components/PageHero.svelte';
 
   let { data } = $props();
-  let category = 'all';
+  let category = $state('all');
 
   const faqSchema = $derived(
     JSON.stringify({

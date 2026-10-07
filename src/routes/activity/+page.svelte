@@ -20,10 +20,10 @@
     announcement: 'Announcement'
   };
 
-  const featured = data.updates.find((item) => item.featured) ?? data.updates[0] ?? null;
-  const remaining = featured
+  const featured = $derived(data.updates.find((item) => item.featured) ?? data.updates[0] ?? null);
+  const remaining = $derived(featured
     ? data.updates.filter((item) => item.slug !== featured.slug)
-    : [];
+    : []);
 
   function updateDate(value: string) {
     return new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(value));

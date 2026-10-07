@@ -46,7 +46,7 @@
     }
   ];
 
-  const programs = data.programs.length
+  const programs = $derived(data.programs.length
     ? data.programs.slice(0, 4).map((program, index) => ({
         number: String(index + 1).padStart(2, '0'),
         slug: program.slug,
@@ -54,14 +54,14 @@
         copy: program.summary,
         icon: program.icon || 'people'
       }))
-    : fallbackPrograms;
+    : fallbackPrograms);
 
-  const featuredCampaign = data.campaigns.find((campaign) => campaign.featured) ?? data.campaigns[0] ?? null;
-  const nextEvent = data.events[0] ?? null;
-  const featuredScholarship = data.scholarships.find((item) => item.application_status === 'open') ?? data.scholarships[0] ?? null;
-  const latestStories = data.stories.slice(0, 3);
-  const visiblePartners = data.partners.slice(0, 6);
-  const homepageSpotlights = data.spotlights.slice(0, 2);
+  const featuredCampaign = $derived(data.campaigns.find((campaign) => campaign.featured) ?? data.campaigns[0] ?? null);
+  const nextEvent = $derived(data.events[0] ?? null);
+  const featuredScholarship = $derived(data.scholarships.find((item) => item.application_status === 'open') ?? data.scholarships[0] ?? null);
+  const latestStories = $derived(data.stories.slice(0, 3));
+  const visiblePartners = $derived(data.partners.slice(0, 6));
+  const homepageSpotlights = $derived(data.spotlights.slice(0, 2));
 
   const principles = [
     ['Global outlook', 'Service is not confined by geography; compassion should reach wherever it is genuinely needed.'],
@@ -104,9 +104,9 @@
       <div class="identity-glow"></div>
       <img
         class="official-logo"
-        src="/brand/queen-tovah-logo.webp"
+        src="/brand/queen-tovah-logo-full.webp"
         alt="Queen Tovah Cares Foundation International logo"
-        width="420"
+        width="380"
         height="280"
       />
       <div class="identity-caption">
@@ -562,9 +562,8 @@
   .official-logo {
     position: relative;
     z-index: 2;
-    width: min(100%, 420px);
-    border-radius: 22px;
-    filter: drop-shadow(0 28px 46px rgba(0, 0, 0, 0.42));
+    width: min(100%, 400px);
+    height: auto;
   }
 
   .identity-caption {
@@ -1396,10 +1395,6 @@
     .identity {
       min-height: 450px;
       padding: 24px;
-    }
-
-    .monogram {
-      transform: scale(0.88);
     }
 
     .trust-strip {

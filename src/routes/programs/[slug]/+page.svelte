@@ -1,7 +1,7 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
-  const { program, updates } = data;
+  const { program, updates } = $derived(data);
 
   const updateLabels: Record<string,string> = {
     field: 'Field update',

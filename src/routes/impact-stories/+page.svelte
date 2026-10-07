@@ -11,10 +11,10 @@
 
   let { data } = $props();
 
-  const featured = data.stories.find((story) => story.featured) ?? data.stories[0] ?? null;
-  const remaining = featured
+  const featured = $derived(data.stories.find((story) => story.featured) ?? data.stories[0] ?? null);
+  const remaining = $derived(featured
     ? data.stories.filter((story) => story.slug !== featured.slug)
-    : [];
+    : []);
 
   const labels: Record<string, string> = {
     humanitarian: 'Humanitarian support',

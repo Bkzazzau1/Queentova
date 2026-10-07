@@ -3,10 +3,10 @@
 
   let { profile = null }: { profile?: SiteProfile | null } = $props();
 
-  let name = '';
-  let email = '';
-  let busy = false;
-  let feedback = '';
+  let name = $state('');
+  let email = $state('');
+  let busy = $state(false);
+  let feedback = $state('');
 
   async function subscribe(event: SubmitEvent) {
     event.preventDefault();
@@ -28,7 +28,7 @@
 <footer id="contact">
   <div class="container footer-grid">
     <div class="intro">
-      <img class="footer-logo" src="/brand/queen-tovah-logo.webp" alt="Queen Tovah Cares Foundation International logo" />
+      <img class="footer-logo" src="/brand/queen-tovah-crest.webp" width="260" height="196" alt="Queen Tovah Cares Foundation International logo" />
       <h2>{profile?.display_name || 'Queen Tovah Cares Foundation International'}</h2>
       <p>
         {profile?.short_description || 'Compassion with dignity. Opportunity with purpose. A global outlook rooted in service to people and communities.'}
@@ -119,10 +119,9 @@
   }
 
   .footer-logo {
-    width: 128px;
-    border: 1px solid rgba(225, 189, 106, 0.24);
-    border-radius: 16px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+    width: 120px;
+    height: auto;
+    margin-left: -10px;
   }
 
   h2 {
@@ -136,7 +135,6 @@
   }
 
   .intro > p,
-  .links span,
   .newsletter-copy {
     color: #a998a8;
   }

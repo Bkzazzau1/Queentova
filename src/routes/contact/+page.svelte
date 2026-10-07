@@ -8,17 +8,17 @@
   import { submitContact, type ContactPayload } from '$lib/api/content';
 
   let { data } = $props();
-  const profile = data.siteProfile;
+  const profile = $derived(data.siteProfile);
 
-  let form: ContactPayload = {
+  let form: ContactPayload = $state({
     name: '',
     email: '',
     enquiry_type: 'general',
     message: ''
-  };
-  let submitting = false;
-  let feedback = '';
-  let succeeded = false;
+  });
+  let submitting = $state(false);
+  let feedback = $state('');
+  let succeeded = $state(false);
 
   async function sendMessage(event: SubmitEvent) {
     event.preventDefault();

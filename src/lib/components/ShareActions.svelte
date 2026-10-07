@@ -7,7 +7,7 @@
     text?: string;
   } = $props();
 
-  let copied = false;
+  let copied = $state(false);
 
   async function copyLink() {
     if (typeof window === 'undefined') return;

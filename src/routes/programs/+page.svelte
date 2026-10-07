@@ -39,7 +39,7 @@
     }
   ];
 
-  const programs = data.programs.length
+  const programs = $derived(data.programs.length
     ? data.programs.map((program, index) => ({
         number: String(index + 1).padStart(2, '0'),
         title: program.title,
@@ -49,7 +49,7 @@
           ? program.body.split('\n').map((item) => item.trim()).filter(Boolean)
           : []
       }))
-    : fallbackPrograms;
+    : fallbackPrograms);
 </script>
 
 <PageHero

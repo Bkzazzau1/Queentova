@@ -7,8 +7,8 @@
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
 
-  const profile = data.siteProfile;
-  const openCauses = data.campaigns.filter((campaign) => campaign.accepting_support).slice(0, 3);
+  const profile = $derived(data.siteProfile);
+  const openCauses = $derived(data.campaigns.filter((campaign) => campaign.accepting_support).slice(0, 3));
 </script>
 
 <PageHero
