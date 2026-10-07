@@ -1,0 +1,673 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  :root {
+    --qt-ink: #130914;
+    --qt-plum: #4b1552;
+    --qt-purple: #64196f;
+    --qt-gold: #c9973f;
+    --qt-gold-soft: #ead49c;
+    --qt-cream: #fbf7ef;
+    --qt-line: rgba(86, 48, 80, .14);
+    --qt-muted: #756873;
+    --qt-green: #587252;
+  }
+
+  #content {
+    max-width: 1560px;
+  }
+
+  .qt-dashboard {
+    display: grid;
+    gap: 24px;
+  }
+
+  .qt-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    gap: 32px;
+    border: 1px solid rgba(201, 151, 63, .22);
+    border-radius: 22px;
+    padding: 30px;
+    background:
+      radial-gradient(circle at 88% 12%, rgba(234, 212, 156, .16), transparent 24rem),
+      linear-gradient(135deg, #35103a, #120713 68%);
+    color: #fff;
+  }
+
+  .qt-hero:after {
+    content: "QT";
+    position: absolute;
+    right: 28px;
+    bottom: -34px;
+    color: rgba(234, 212, 156, .08);
+    font: 700 9rem/1 Georgia, serif;
+  }
+
+  .qt-eyebrow {
+    margin: 0 0 8px;
+    color: var(--qt-gold-soft);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .qt-hero h1 {
+    margin: 0;
+    color: #fff;
+    font: 600 clamp(2rem, 4vw, 3.6rem)/1 Georgia, serif;
+  }
+
+  .qt-hero p {
+    max-width: 760px;
+    margin: 12px 0 0;
+    color: #cdbfca;
+    line-height: 1.6;
+  }
+
+  .qt-hero-meta {
+    position: relative;
+    z-index: 1;
+    align-self: flex-end;
+    min-width: 220px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 16px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,.05);
+    color: #d8ccd6;
+    font-size: 12px;
+  }
+
+  .qt-hero-meta strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--qt-gold-soft);
+    font-size: 18px;
+  }
+
+  .qt-metrics {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .qt-metric {
+    position: relative;
+    overflow: hidden;
+    min-height: 134px;
+    border: 1px solid var(--qt-line);
+    border-radius: 18px;
+    padding: 18px;
+    background: #fff;
+    text-decoration: none !important;
+    box-shadow: 0 12px 34px rgba(45, 24, 42, .045);
+  }
+
+  .qt-metric:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: var(--qt-purple);
+  }
+
+  .qt-metric[data-tone="gold"]:before { background: var(--qt-gold); }
+  .qt-metric[data-tone="plum"]:before { background: var(--qt-plum); }
+  .qt-metric[data-tone="green"]:before { background: #6d8a66; }
+  .qt-metric[data-tone="blue"]:before { background: #607d9f; }
+  .qt-metric[data-tone="neutral"]:before { background: #8c7a87; }
+
+  .qt-metric span {
+    display: block;
+    color: var(--qt-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .qt-metric strong {
+    display: block;
+    margin-top: 16px;
+    color: #3c2238;
+    font: 600 2.5rem/1 Georgia, serif;
+  }
+
+  .qt-metric small {
+    display: block;
+    margin-top: 8px;
+    color: #91838e;
+    line-height: 1.35;
+  }
+
+  .qt-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, .72fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .qt-stack {
+    display: grid;
+    gap: 18px;
+  }
+
+  .qt-panel {
+    overflow: hidden;
+    border: 1px solid var(--qt-line);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 12px 34px rgba(45, 24, 42, .035);
+  }
+
+  .qt-panel-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--qt-line);
+    padding: 20px 22px;
+  }
+
+  .qt-panel-head h2 {
+    margin: 0;
+    color: #3c2238;
+    font: 600 22px/1.1 Georgia, serif;
+  }
+
+  .qt-panel-head p {
+    margin: 5px 0 0;
+    color: #897b86;
+    font-size: 12px;
+  }
+
+  .qt-panel-head a {
+    color: #8a5d1f;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .qt-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .qt-list li {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 16px;
+    align-items: center;
+    border-bottom: 1px solid rgba(86, 48, 80, .09);
+    padding: 15px 22px;
+  }
+
+  .qt-list li:last-child {
+    border-bottom: 0;
+  }
+
+  .qt-list a {
+    color: #4b2d46;
+    font-weight: 700;
+  }
+
+  .qt-list .qt-sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 12px;
+    margin-top: 5px;
+    color: #8b7d88;
+    font-size: 11px;
+  }
+
+  .qt-status {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(86, 48, 80, .12);
+    border-radius: 999px;
+    padding: 5px 8px;
+    color: #725f6d;
+    background: #faf7f9;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .qt-status.good {
+    border-color: rgba(88, 114, 82, .22);
+    color: var(--qt-green);
+    background: #f5faf3;
+  }
+
+  .qt-empty {
+    padding: 28px 22px;
+    color: #8b7d88;
+    font-size: 12px;
+  }
+
+  .qt-quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    padding: 14px;
+  }
+
+  .qt-quick a {
+    min-height: 76px;
+    border: 1px solid var(--qt-line);
+    border-radius: 14px;
+    padding: 13px;
+    color: #4a3046;
+    background: var(--qt-cream);
+    text-decoration: none;
+  }
+
+  .qt-quick strong {
+    display: block;
+    color: #4a3046;
+    font-size: 12px;
+  }
+
+  .qt-quick span {
+    display: block;
+    margin-top: 5px;
+    color: #8a7a86;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .qt-content-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 14px 22px 6px;
+  }
+
+  .qt-content-summary div {
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--qt-cream);
+  }
+
+  .qt-content-summary strong {
+    display: block;
+    color: #472941;
+    font: 600 1.55rem/1 Georgia, serif;
+  }
+
+  .qt-content-summary span {
+    display: block;
+    margin-top: 5px;
+    color: #887a85;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  .qt-campaign {
+    padding: 16px 22px;
+    border-bottom: 1px solid rgba(86,48,80,.09);
+  }
+
+  .qt-campaign:last-child {
+    border-bottom: 0;
+  }
+
+  .qt-campaign-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .qt-campaign-top a {
+    color: #4a2b45;
+    font-weight: 700;
+  }
+
+  .qt-campaign-top span {
+    color: #8a7a86;
+    font-size: 11px;
+  }
+
+  .qt-progress {
+    overflow: hidden;
+    height: 7px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: #eee7ec;
+  }
+
+  .qt-progress i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--qt-plum), var(--qt-gold));
+  }
+
+  .qt-ops-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .qt-admin-apps {
+    margin-top: 4px;
+    border-top: 1px solid var(--qt-line);
+    padding-top: 22px;
+  }
+
+  .qt-admin-apps > h2 {
+    color: #3c2238;
+    font: 600 24px/1 Georgia, serif;
+  }
+
+  @media (max-width: 1180px) {
+    .qt-metrics { grid-template-columns: repeat(3, 1fr); }
+    .qt-layout { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 760px) {
+    .qt-hero { flex-direction: column; }
+    .qt-metrics { grid-template-columns: 1fr 1fr; }
+    .qt-ops-grid { grid-template-columns: 1fr; }
+    .qt-panel-head { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (max-width: 520px) {
+    .qt-metrics { grid-template-columns: 1fr; }
+    .qt-quick { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="qt-dashboard">
+  <section class="qt-hero">
+    <div>
+      <p class="qt-eyebrow">Executive command centre</p>
+      <h1>Foundation operations at a glance.</h1>
+      <p>
+        Welcome back, {{ user.get_short_name|default:user.get_username }}. This private dashboard
+        prioritises work requiring attention without exposing full case narratives, documents or
+        reviewer notes on the landing screen.
+      </p>
+    </div>
+    <div class="qt-hero-meta">
+      Assigned scholarship applications
+      <strong>{{ dashboard_assigned_to_me }}</strong>
+      <span>Updated {{ dashboard_generated_at|date:"j M Y, H:i" }}</span>
+    </div>
+  </section>
+
+  <section class="qt-metrics" aria-label="Foundation operational metrics">
+    {% for metric in dashboard_metrics %}
+      <a class="qt-metric" data-tone="{{ metric.tone }}" href="{{ metric.url }}">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+        <small>{{ metric.hint }}</small>
+      </a>
+    {% endfor %}
+  </section>
+
+  <div class="qt-layout">
+    <div class="qt-stack">
+      <section class="qt-panel">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Scholarship review pipeline</h2>
+            <p>Recent active applications. Scores and documents remain inside the full record.</p>
+          </div>
+          <a href="{{ dashboard_urls.scholarships }}">Open applications →</a>
+        </div>
+        {% if dashboard_scholarship_queue %}
+          <ul class="qt-list">
+            {% for application in dashboard_scholarship_queue %}
+              <li>
+                <div>
+                  <a href="{% url 'admin:core_scholarshipapplication_change' application.pk %}">
+                    {{ application.reference_code }} — {{ application.first_name }} {{ application.last_name }}
+                  </a>
+                  <div class="qt-sub">
+                    <span>{{ application.scholarship.title }}</span>
+                    <span>{{ application.submitted_at|date:"j M Y" }}</span>
+                    {% if application.assigned_reviewer %}
+                      <span>Reviewer: {{ application.assigned_reviewer.get_username }}</span>
+                    {% else %}
+                      <span>Unassigned</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <span class="qt-status">{{ application.get_review_status_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="qt-empty">No scholarship applications currently need active review.</div>
+        {% endif %}
+      </section>
+
+      <div class="qt-ops-grid">
+        <section class="qt-panel">
+          <div class="qt-panel-head">
+            <div>
+              <h2>Humanitarian support</h2>
+              <p>Open private support cases.</p>
+            </div>
+            <a href="{{ dashboard_urls.support }}">Open queue →</a>
+          </div>
+          {% if dashboard_support_queue %}
+            <ul class="qt-list">
+              {% for item in dashboard_support_queue %}
+                <li>
+                  <div>
+                    <a href="{% url 'admin:core_supportrequest_change' item.pk %}">{{ item.name }}</a>
+                    <div class="qt-sub">
+                      <span>{{ item.get_assistance_type_display }}</span>
+                      <span>{{ item.country }}</span>
+                      <span>{{ item.created_at|date:"j M" }}</span>
+                    </div>
+                  </div>
+                  <span class="qt-status">{{ item.get_status_display }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="qt-empty">No open support requests.</div>
+          {% endif %}
+        </section>
+
+        <section class="qt-panel">
+          <div class="qt-panel-head">
+            <div>
+              <h2>Enquiries</h2>
+              <p>General, partnership, scholarship and media contact.</p>
+            </div>
+            <a href="{{ dashboard_urls.enquiries }}">Open enquiries →</a>
+          </div>
+          {% if dashboard_enquiry_queue %}
+            <ul class="qt-list">
+              {% for item in dashboard_enquiry_queue %}
+                <li>
+                  <div>
+                    <a href="{% url 'admin:core_contactsubmission_change' item.pk %}">{{ item.name }}</a>
+                    <div class="qt-sub">
+                      <span>{{ item.get_enquiry_type_display }}</span>
+                      <span>{{ item.created_at|date:"j M" }}</span>
+                    </div>
+                  </div>
+                  <span class="qt-status">{{ item.get_status_display }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="qt-empty">No open enquiries.</div>
+          {% endif %}
+        </section>
+      </div>
+
+      <section class="qt-panel" id="content-review">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Editorial control</h2>
+            <p>Draft, review and published content across the website.</p>
+          </div>
+          <a href="{{ dashboard_urls.content_activity }}">Open activity content →</a>
+        </div>
+        <div class="qt-content-summary">
+          <div><strong>{{ dashboard_content_counts.draft }}</strong><span>Draft</span></div>
+          <div><strong>{{ dashboard_content_counts.review }}</strong><span>In review</span></div>
+          <div><strong>{{ dashboard_content_counts.published }}</strong><span>Published</span></div>
+        </div>
+        {% if dashboard_content_review_items %}
+          <ul class="qt-list">
+            {% for item in dashboard_content_review_items %}
+              <li>
+                <div>
+                  <a href="{{ item.url }}">{{ item.title }}</a>
+                  <div class="qt-sub">
+                    <span>{{ item.model }}</span>
+                    <span>Updated {{ item.updated_at|timesince }} ago</span>
+                  </div>
+                </div>
+                <span class="qt-status">Review</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="qt-empty">The editorial review queue is clear.</div>
+        {% endif %}
+      </section>
+    </div>
+
+    <aside class="qt-stack">
+      <section class="qt-panel">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Quick actions</h2>
+            <p>Common management tasks.</p>
+          </div>
+        </div>
+        <div class="qt-quick">
+          {% for action in dashboard_quick_actions %}
+            <a href="{{ action.url }}">
+              <strong>{{ action.label }}</strong>
+              <span>{{ action.description }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="qt-panel">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Active campaigns</h2>
+            <p>Fundraising causes currently accepting support.</p>
+          </div>
+        </div>
+        {% if dashboard_campaigns %}
+          {% for campaign in dashboard_campaigns %}
+            <div class="qt-campaign">
+              <div class="qt-campaign-top">
+                <a href="{{ campaign.url }}">{{ campaign.title }}</a>
+                {% if campaign.goal_amount %}
+                  <span>{{ campaign.currency }} {{ campaign.current_amount|floatformat:0 }} / {{ campaign.goal_amount|floatformat:0 }}</span>
+                {% else %}
+                  <span>{{ campaign.currency }} {{ campaign.current_amount|floatformat:0 }}</span>
+                {% endif %}
+              </div>
+              {% if campaign.progress != None %}
+                <div class="qt-progress" aria-label="{{ campaign.progress }} percent funded">
+                  <i style="width: {{ campaign.progress }}%"></i>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="qt-empty">No published campaign is currently accepting support.</div>
+        {% endif %}
+      </section>
+
+      <section class="qt-panel">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Volunteer review</h2>
+            <p>New and reviewing applications.</p>
+          </div>
+          <a href="{{ dashboard_urls.volunteers }}">Open volunteers →</a>
+        </div>
+        {% if dashboard_volunteer_queue %}
+          <ul class="qt-list">
+            {% for item in dashboard_volunteer_queue %}
+              <li>
+                <div>
+                  <a href="{% url 'admin:core_volunteerapplication_change' item.pk %}">{{ item.name }}</a>
+                  <div class="qt-sub">
+                    {% if item.country %}<span>{{ item.country }}</span>{% endif %}
+                    <span>{{ item.areas_of_interest|truncatechars:36 }}</span>
+                  </div>
+                </div>
+                <span class="qt-status">{{ item.get_status_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="qt-empty">No volunteer applications need review.</div>
+        {% endif %}
+      </section>
+
+      <section class="qt-panel">
+        <div class="qt-panel-head">
+          <div>
+            <h2>Upcoming calendar</h2>
+            <p>Open scholarships and upcoming events.</p>
+          </div>
+        </div>
+        {% if dashboard_open_scholarships or dashboard_upcoming_events %}
+          <ul class="qt-list">
+            {% for scholarship in dashboard_open_scholarships %}
+              <li>
+                <div>
+                  <a href="{% url 'admin:core_scholarship_change' scholarship.pk %}">{{ scholarship.title }}</a>
+                  <div class="qt-sub">
+                    <span>Scholarship</span>
+                    {% if scholarship.closes_at %}<span>Closes {{ scholarship.closes_at|date:"j M" }}</span>{% endif %}
+                  </div>
+                </div>
+                <span class="qt-status good">Open</span>
+              </li>
+            {% endfor %}
+            {% for event in dashboard_upcoming_events %}
+              <li>
+                <div>
+                  <a href="{% url 'admin:core_event_change' event.pk %}">{{ event.title }}</a>
+                  <div class="qt-sub">
+                    <span>Event</span>
+                    <span>{{ event.starts_at|date:"j M Y" }}</span>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="qt-empty">No open scholarship or upcoming published event.</div>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+
+  <section class="qt-admin-apps">
+    <h2>All administration modules</h2>
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+  </section>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
