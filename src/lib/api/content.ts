@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media' | 'activity-update';
   title: string;
   excerpt: string;
   url: string;
@@ -396,6 +396,49 @@ export interface FounderMediaItem {
   featured: boolean;
   verified_source: boolean;
   photos: FounderMediaPhoto[];
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at: string | null;
+}
+
+
+export interface ActivityUpdateMedia {
+  media_type: 'photo' | 'document';
+  url: string | null;
+  alt_text: string;
+  caption: string;
+  credit: string;
+  source_url: string;
+  featured: boolean;
+  display_order: number;
+}
+
+export interface ActivityUpdate {
+  title: string;
+  slug: string;
+  kind: 'field' | 'milestone' | 'delivery' | 'funding' | 'impact' | 'announcement';
+  summary: string;
+  body: string;
+  occurred_at: string;
+  location_label: string;
+  featured: boolean;
+  video_url: string;
+  campaign_slug: string | null;
+  campaign_title: string | null;
+  program_slug: string | null;
+  program_title: string | null;
+  expenditure_amount: string | null;
+  expenditure_currency: string;
+  expenditure_note: string;
+  expenditure_verified: boolean;
+  output_value: string | null;
+  output_unit: string;
+  output_note: string;
+  verification_note: string;
+  source_reference: string;
+  source_url: string;
+  media: ActivityUpdateMedia[];
   seo_title?: string;
   seo_description?: string;
   seo_keywords?: string;
