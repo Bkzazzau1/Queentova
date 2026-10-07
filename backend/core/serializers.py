@@ -21,6 +21,7 @@ from .models import (
     Partner,
     PartnerCollaboration,
     Program,
+    PublishableModel,
     Resource,
     Scholarship,
     SiteProfile,
@@ -386,7 +387,7 @@ class CampaignUpdateSerializer(serializers.ModelSerializer):
     campaign_title = serializers.CharField(source="campaign.title", read_only=True, allow_null=True)
     program_slug = serializers.CharField(source="program.slug", read_only=True, allow_null=True)
     program_title = serializers.CharField(source="program.title", read_only=True, allow_null=True)
-    partners = PartnerSerializer(many=True, read_only=True)
+    partners = serializers.SerializerMethodField()
 
     class Meta:
         model = CampaignUpdate
@@ -399,6 +400,17 @@ class CampaignUpdateSerializer(serializers.ModelSerializer):
             "verification_note", "source_reference", "source_url", "media",
             "seo_title", "seo_description", "seo_keywords", "published_at",
         ]
+
+    def get_partners(self, obj):
+        approved = obj.partners.filter(
+            status=PublishableModel.PublicationStatus.PUBLISHED,
+            verified_relationship=True,
+        )
+        return PartnerSerializer(
+            approved,
+            many=True,
+            context=self.context,
+        ).data
 
     def get_media(self, obj):
         approved = obj.media.filter(
