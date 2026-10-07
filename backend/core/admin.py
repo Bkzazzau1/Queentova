@@ -1,4 +1,5 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from .models import (
@@ -12,6 +13,7 @@ from .models import (
     GalleryItem,
     HomepageSpotlight,
     ImpactMetric,
+    ImpactStory,
     NewsletterSubscriber,
     Partner,
     Program,
@@ -88,6 +90,104 @@ class HomepageSpotlightAdmin(PublishWorkflowAdmin):
     search_fields = ("eyebrow", "title", "summary", "link_url")
     prepopulated_fields = {"slug": ("title",)}
     ordering = ("display_order", "-priority", "-published_at")
+
+
+@admin.register(ImpactStory)
+class ImpactStoryAdmin(PublishWorkflowAdmin):
+    list_display = (
+        "title", "program_area", "identity_mode", "consent_status",
+        "privacy_reviewed", "featured", "status", "updated_at",
+    )
+    list_filter = (
+        "status", "consent_status", "privacy_reviewed", "story_consent",
+        "photo_consent", "quote_consent", "is_minor", "featured", "program_area",
+    )
+    search_fields = (
+        "title", "excerpt", "body", "approved_display_name",
+        "location_label", "consent_reference",
+    )
+    prepopulated_fields = {"slug": ("title",)}
+    actions = ["move_to_review", "publish_selected", "return_to_draft", "withdraw_consent"]
+    fieldsets = (
+        (
+            "Public story",
+            {
+                "fields": (
+                    "title", "slug", "excerpt", "body", "program_area",
+                    "identity_mode", "approved_display_name", "age_group",
+                    "location_label", "image", "image_alt", "quote",
+                    "quote_attribution", "featured", "display_order",
+                )
+            },
+        ),
+        (
+            "Consent & privacy review — internal only",
+            {
+                "fields": (
+                    "consent_status", "story_consent", "photo_consent",
+                    "quote_consent", "privacy_reviewed", "is_minor",
+                    "guardian_consent", "consent_reference",
+                    "consent_recorded_at", "consent_withdrawn_at",
+                    "consent_review_note",
+                )
+            },
+        ),
+        (
+            "Publishing & SEO",
+            {
+                "fields": (
+                    "status", "published_at", "seo_title",
+                    "seo_description", "seo_keywords", "og_image",
+                    "created_at", "updated_at",
+                )
+            },
+        ),
+    )
+
+    @admin.action(description="Publish selected impact stories after consent validation")
+    def publish_selected(self, request, queryset):
+        published = 0
+        rejected = []
+
+        for obj in queryset:
+            obj.status = obj.PublicationStatus.PUBLISHED
+            if not obj.published_at:
+                obj.published_at = timezone.now()
+            try:
+                obj.full_clean()
+            except ValidationError as exc:
+                rejected.append(f"{obj.title}: {exc.message_dict}")
+                continue
+            obj.save()
+            published += 1
+
+        if published:
+            self.message_user(
+                request,
+                f"{published} impact stor{'y' if published == 1 else 'ies'} published.",
+                level=messages.SUCCESS,
+            )
+        if rejected:
+            self.message_user(
+                request,
+                "Not published because consent/privacy requirements were incomplete: "
+                + " | ".join(rejected),
+                level=messages.WARNING,
+            )
+
+    @admin.action(description="Withdraw consent and unpublish selected impact stories")
+    def withdraw_consent(self, request, queryset):
+        count = queryset.update(
+            consent_status=ImpactStory.ConsentStatus.WITHDRAWN,
+            consent_withdrawn_at=timezone.now(),
+            status=ImpactStory.PublicationStatus.DRAFT,
+            published_at=None,
+        )
+        self.message_user(
+            request,
+            f"Consent withdrawn and {count} stor{'y' if count == 1 else 'ies'} unpublished.",
+            level=messages.SUCCESS,
+        )
 
 
 @admin.register(ImpactMetric)
