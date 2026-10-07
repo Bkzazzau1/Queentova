@@ -119,5 +119,7 @@ REST_FRAMEWORK = {
         "volunteer": "5/hour",
         "newsletter": "12/hour",
         "support_request": "4/hour",
+        "scholarship_application": "4/hour",
+        "scholarship_status": "12/hour",
     },
 }
