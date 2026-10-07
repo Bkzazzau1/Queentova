@@ -113,6 +113,16 @@
         {#if update.location_label}<div><dt>Location</dt><dd>{update.location_label}</dd></div>{/if}
         {#if update.campaign_title}<div><dt>Cause</dt><dd><a href={`/causes/${update.campaign_slug}`}>{update.campaign_title}</a></dd></div>{/if}
         {#if update.program_title}<div><dt>Program</dt><dd><a href={`/programs/${update.program_slug}`}>{update.program_title}</a></dd></div>{/if}
+        {#if update.partners.length}
+          <div class="partner-record">
+            <dt>Partner{update.partners.length === 1 ? '' : 's'}</dt>
+            <dd>
+              {#each update.partners as partner, i}
+                <a href={`/partners/${partner.slug}`}>{partner.title}</a>{i < update.partners.length - 1 ? ', ' : ''}
+              {/each}
+            </dd>
+          </div>
+        {/if}
       </dl>
 
       {#if outputText()}
