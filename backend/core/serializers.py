@@ -4,6 +4,8 @@ from rest_framework import serializers
 from .models import (
     Announcement,
     Campaign,
+    CampaignUpdate,
+    CampaignUpdateMedia,
     ContactSubmission,
     Event,
     FAQ,
@@ -313,6 +315,65 @@ class FounderMediaItemSerializer(serializers.ModelSerializer):
             (Q(image__isnull=False) & ~Q(image="")) | Q(reuse_approved=True)
         )
         return FounderMediaPhotoSerializer(
+            approved,
+            many=True,
+            context=self.context,
+        ).data
+
+
+class CampaignUpdateMediaSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CampaignUpdateMedia
+        fields = [
+            "media_type", "url", "alt_text", "caption", "credit",
+            "source_url", "featured", "display_order",
+        ]
+
+    def get_url(self, obj):
+        request = self.context.get("request")
+
+        if obj.image:
+            url = obj.image.url
+            return request.build_absolute_uri(url) if request else url
+
+        if obj.file:
+            url = obj.file.url
+            return request.build_absolute_uri(url) if request else url
+
+        if obj.external_url and obj.reuse_approved:
+            return obj.external_url
+
+        return None
+
+
+class CampaignUpdateSerializer(serializers.ModelSerializer):
+    media = serializers.SerializerMethodField()
+    campaign_slug = serializers.CharField(source="campaign.slug", read_only=True, allow_null=True)
+    campaign_title = serializers.CharField(source="campaign.title", read_only=True, allow_null=True)
+    program_slug = serializers.CharField(source="program.slug", read_only=True, allow_null=True)
+    program_title = serializers.CharField(source="program.title", read_only=True, allow_null=True)
+
+    class Meta:
+        model = CampaignUpdate
+        fields = [
+            "title", "slug", "kind", "summary", "body", "occurred_at",
+            "location_label", "featured", "video_url",
+            "campaign_slug", "campaign_title", "program_slug", "program_title",
+            "expenditure_amount", "expenditure_currency", "expenditure_note",
+            "expenditure_verified", "output_value", "output_unit", "output_note",
+            "verification_note", "source_reference", "source_url", "media",
+            "seo_title", "seo_description", "seo_keywords", "published_at",
+        ]
+
+    def get_media(self, obj):
+        approved = obj.media.filter(
+            Q(reuse_approved=True)
+            | (Q(image__isnull=False) & ~Q(image=""))
+            | (Q(file__isnull=False) & ~Q(file=""))
+        )
+        return CampaignUpdateMediaSerializer(
             approved,
             many=True,
             context=self.context,
