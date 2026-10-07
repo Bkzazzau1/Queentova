@@ -13,7 +13,8 @@
     campaign: 'Cause',
     event: 'Event',
     resource: 'Resource',
-    faq: 'FAQ'
+    faq: 'FAQ',
+    'impact-story': 'Story of Impact'
   };
 </script>
 
