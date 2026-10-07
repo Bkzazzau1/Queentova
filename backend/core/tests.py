@@ -1,11 +1,12 @@
 from datetime import timedelta
 
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, Scholarship, ScholarshipApplication, ScholarshipApplicationDocument, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -517,3 +518,215 @@ class PublicApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         partner_slugs = [item["slug"] for item in response.data["partners"]]
         self.assertEqual(partner_slugs, ["verified-activity-partner"])
+
+
+    def test_internal_scholarship_application_returns_private_receipt_only(self):
+        scholarship = Scholarship.objects.create(
+            title="Private Scholarship",
+            slug="private-scholarship",
+            summary="Apply privately.",
+            application_status=Scholarship.ApplicationStatus.OPEN,
+            internal_applications_enabled=True,
+            opens_at=timezone.now() - timedelta(days=1),
+            closes_at=timezone.now() + timedelta(days=7),
+            status="published",
+        )
+        transcript = SimpleUploadedFile(
+            "transcript.pdf",
+            b"%PDF-1.4 private academic record",
+            content_type="application/pdf",
+        )
+
+        response = self.client.post(
+            f"/api/v1/scholarships/{scholarship.slug}/apply/",
+            {
+                "first_name": "Ada",
+                "last_name": "Applicant",
+                "email": "ada@example.com",
+                "phone": "+2348000000000",
+                "country": "Nigeria",
+                "city": "Awka",
+                "institution": "Example University",
+                "course_of_study": "Engineering",
+                "current_level": "300",
+                "academic_summary": "Strong academic performance.",
+                "financial_need_statement": "I need support to continue my education.",
+                "personal_statement": "Education will help me contribute to my community.",
+                "consent_to_processing": True,
+                "declaration_true": True,
+                "academic_document": transcript,
+            },
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("reference_code", response.data)
+        self.assertEqual(response.data["status"], "submitted")
+        self.assertNotIn("email", response.data)
+        self.assertNotIn("first_name", response.data)
+        self.assertNotIn("academic_document", response.data)
+
+        application = ScholarshipApplication.objects.get(email="ada@example.com")
+        self.assertEqual(application.scholarship, scholarship)
+        self.assertEqual(application.documents.count(), 1)
+        document = ScholarshipApplicationDocument.objects.get(application=application)
+        self.assertEqual(document.document_type, "academic")
+
+    def test_scholarship_application_is_rejected_outside_open_window(self):
+        scholarship = Scholarship.objects.create(
+            title="Closed Internal Scholarship",
+            slug="closed-internal-scholarship",
+            summary="Applications closed.",
+            application_status=Scholarship.ApplicationStatus.OPEN,
+            internal_applications_enabled=True,
+            opens_at=timezone.now() - timedelta(days=10),
+            closes_at=timezone.now() - timedelta(days=1),
+            status="published",
+        )
+
+        response = self.client.post(
+            f"/api/v1/scholarships/{scholarship.slug}/apply/",
+            {
+                "first_name": "Late",
+                "last_name": "Applicant",
+                "email": "late@example.com",
+                "country": "Nigeria",
+                "financial_need_statement": "Need.",
+                "personal_statement": "Statement.",
+                "consent_to_processing": True,
+                "declaration_true": True,
+            },
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(ScholarshipApplication.objects.count(), 0)
+
+    def test_duplicate_scholarship_email_is_rejected(self):
+        scholarship = Scholarship.objects.create(
+            title="One Application Scholarship",
+            slug="one-application-scholarship",
+            summary="One application per email.",
+            application_status=Scholarship.ApplicationStatus.OPEN,
+            internal_applications_enabled=True,
+            status="published",
+        )
+        payload = {
+            "first_name": "One",
+            "last_name": "Applicant",
+            "email": "same@example.com",
+            "country": "Nigeria",
+            "financial_need_statement": "Need statement.",
+            "personal_statement": "Personal statement.",
+            "consent_to_processing": True,
+            "declaration_true": True,
+        }
+
+        first = self.client.post(
+            f"/api/v1/scholarships/{scholarship.slug}/apply/",
+            payload,
+            format="multipart",
+        )
+        second = self.client.post(
+            f"/api/v1/scholarships/{scholarship.slug}/apply/",
+            payload,
+            format="multipart",
+        )
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(second.status_code, 400)
+        self.assertEqual(ScholarshipApplication.objects.count(), 1)
+
+    def test_application_status_lookup_does_not_expose_scores_or_documents(self):
+        scholarship = Scholarship.objects.create(
+            title="Status Scholarship",
+            slug="status-scholarship",
+            summary="Track privately.",
+            status="published",
+        )
+        application = ScholarshipApplication.objects.create(
+            scholarship=scholarship,
+            first_name="Status",
+            last_name="Applicant",
+            email="status@example.com",
+            country="Nigeria",
+            financial_need_statement="Need",
+            personal_statement="Statement",
+            consent_to_processing=True,
+            declaration_true=True,
+            review_status=ScholarshipApplication.ReviewStatus.SHORTLISTED,
+            eligibility_score="88.00",
+            overall_score="85.00",
+        )
+
+        response = self.client.post(
+            "/api/v1/scholarship-application-status/",
+            {
+                "reference_code": application.reference_code,
+                "email": "status@example.com",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], "shortlisted")
+        self.assertNotIn("eligibility_score", response.data)
+        self.assertNotIn("overall_score", response.data)
+        self.assertNotIn("documents", response.data)
+
+        wrong_email = self.client.post(
+            "/api/v1/scholarship-application-status/",
+            {
+                "reference_code": application.reference_code,
+                "email": "wrong@example.com",
+            },
+            format="json",
+        )
+        self.assertEqual(wrong_email.status_code, 404)
+
+    def test_public_scholarship_results_are_aggregate_and_release_controlled(self):
+        scholarship = Scholarship.objects.create(
+            title="Results Scholarship",
+            slug="results-scholarship",
+            summary="Aggregate results only.",
+            max_awards=2,
+            public_results_released=False,
+            status="published",
+        )
+        ScholarshipApplication.objects.create(
+            scholarship=scholarship,
+            first_name="Selected",
+            last_name="Applicant",
+            email="selected@example.com",
+            country="Nigeria",
+            financial_need_statement="Need",
+            personal_statement="Statement",
+            consent_to_processing=True,
+            declaration_true=True,
+            review_status=ScholarshipApplication.ReviewStatus.APPROVED,
+        )
+
+        hidden = self.client.get("/api/v1/scholarships/results-scholarship/")
+        self.assertEqual(hidden.status_code, 200)
+        self.assertIsNone(hidden.data["results_summary"])
+
+        scholarship.public_results_released = True
+        scholarship.public_results_note = "Selection has concluded."
+        scholarship.save()
+
+        released = self.client.get("/api/v1/scholarships/results-scholarship/")
+        self.assertEqual(released.status_code, 200)
+        self.assertEqual(released.data["results_summary"]["selected"], 1)
+        self.assertEqual(released.data["results_summary"]["applications_received"], 1)
+        self.assertNotIn("applications", released.data)
+
+    def test_scholarship_rejects_mixed_internal_and_external_application_channels(self):
+        scholarship = Scholarship(
+            title="Ambiguous Channel",
+            slug="ambiguous-channel",
+            summary="Invalid configuration.",
+            internal_applications_enabled=True,
+            application_url="https://example.com/apply",
+        )
+
+        with self.assertRaises(ValidationError):
+            scholarship.full_clean()
