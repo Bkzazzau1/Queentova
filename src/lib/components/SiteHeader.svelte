@@ -32,6 +32,7 @@
     { label: 'Founder', href: '/founder/jessie-ifeoma-udoka-menuba' },
     { label: 'Founder Recognition & Media', href: '/founder/media' },
     { label: 'Impact & Accountability', href: '/impact' },
+    { label: 'Activity Journal', href: '/activity' },
     { label: 'Stories of Impact', href: '/impact-stories' },
     { label: 'Governance & Transparency', href: '/governance' },
     { label: 'Scholarships', href: '/scholarships' },
