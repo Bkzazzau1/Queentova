@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AnnouncementViewSet,
     CampaignViewSet,
+    CampaignUpdateViewSet,
     ContactSubmissionCreateView,
     EventViewSet,
     FAQViewSet,
@@ -42,6 +43,7 @@ router.register("scholarships", ScholarshipViewSet, basename="scholarship")
 router.register("partners", PartnerViewSet, basename="partner")
 router.register("resources", ResourceViewSet, basename="resource")
 router.register("campaigns", CampaignViewSet, basename="campaign")
+router.register("activity-updates", CampaignUpdateViewSet, basename="activity-update")
 router.register("events", EventViewSet, basename="event")
 router.register("site-profile", SiteProfileViewSet, basename="site-profile")
 
