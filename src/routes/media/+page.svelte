@@ -15,6 +15,13 @@
     ['press-kit', 'annual-report', 'impact-report', 'publication'].includes(item.category)
   );
   const stories = data.stories.slice(0, 6);
+  const founderMedia = data.founderMedia.slice(0, 4);
+
+  function founderPhoto(item: (typeof data.founderMedia)[number]) {
+    return item.photos.find((photo) => photo.is_primary && photo.image_url) ??
+      item.photos.find((photo) => photo.image_url) ??
+      null;
+  }
 </script>
 
 <PageHero
@@ -59,6 +66,42 @@
           <h3>{item.title}</h3>
           <p>{item.summary}</p>
           <em>Open resource ↗</em>
+        </a>
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
+
+
+{#if founderMedia.length}
+<section class="founder-media">
+  <div class="container">
+    <div class="section-head founder-media-head">
+      <div>
+        <p class="eyebrow">Founder recognition & media</p>
+        <h2 class="section-title">Awards, coverage and publication records.</h2>
+      </div>
+      <a href="/founder/media">Open founder media archive ↗</a>
+    </div>
+
+    <div class="founder-media-grid">
+      {#each founderMedia as item, i}
+        {@const photo = founderPhoto(item)}
+        <a class:lead-founder={i === 0} href={`/founder/media/${item.slug}`}>
+          <div class="founder-visual">
+            {#if photo}
+              <img src={photo.image_url} alt={photo.alt_text || item.title} loading="lazy" />
+            {:else}
+              <span>QT</span>
+            {/if}
+          </div>
+          <div class="founder-copy">
+            <span>{item.kind.replace('-', ' ')}</span>
+            <h3>{item.title}</h3>
+            <p>{item.summary}</p>
+            <small>{item.source_name} ↗</small>
+          </div>
         </a>
       {/each}
     </div>
@@ -127,6 +170,21 @@
   .resource-grid p{margin:0;color:#a998a8;font-size:.84rem}
   .resource-grid em{margin-top:auto;padding-top:18px;color:var(--gold-bright);font-size:.75rem;font-style:normal;font-weight:700}
 
+  .founder-media{padding:110px 0;background:var(--ivory);color:#2b1827}
+  .founder-media .eyebrow{color:#8e6020}
+  .founder-media .section-title{color:#351e32}
+  .founder-media-head>a{color:#8e6020}
+  .founder-media-grid{display:grid;grid-template-columns:1.2fr .8fr;grid-template-rows:230px 230px 230px;gap:14px;margin-top:46px}
+  .founder-media-grid>a{display:grid;grid-template-columns:180px 1fr;overflow:hidden;border:1px solid rgba(80,45,70,.12);border-radius:24px;background:#fff}
+  .founder-media-grid>a.lead-founder{grid-row:1/4;grid-template-columns:1fr;grid-template-rows:1.1fr .9fr}
+  .founder-visual{display:grid;place-items:center;min-height:0;background:linear-gradient(145deg,#4c1553,#150817);color:var(--gold-bright);font:600 2.6rem/1 'Cormorant Garamond',Georgia,serif}
+  .founder-visual img{width:100%;height:100%;object-fit:cover}
+  .founder-copy{padding:20px}
+  .founder-copy>span{color:#9b6c29;font-size:.66rem;font-weight:800;text-transform:uppercase}
+  .founder-copy h3{margin:9px 0 8px;color:#43213f;font:600 1.55rem/1 'Cormorant Garamond',Georgia,serif}
+  .lead-founder .founder-copy h3{font-size:2.4rem}
+  .founder-copy p{margin:0;color:#6d5b68;font-size:.82rem}
+  .founder-copy small{display:block;margin-top:14px;color:#8e6020}
   .coverage{padding:112px 0;background:var(--cream);color:#2b1827}
   .coverage .section-title{color:#351e32}
   .coverage .section-head>a{color:#8e6020}
@@ -147,6 +205,6 @@
   .contact-card h2{max-width:790px;margin:0;color:var(--ivory);font:600 clamp(2.4rem,5vw,4rem)/.98 'Cormorant Garamond',Georgia,serif}
   .contact-card p:not(.eyebrow){max-width:720px;color:#ad9daa}
 
-  @media(max-width:880px){.intro-grid{grid-template-columns:1fr;gap:38px}.resource-grid,.story-grid{grid-template-columns:1fr 1fr}.contact-card{align-items:flex-start;flex-direction:column}}
-  @media(max-width:600px){.resource-grid,.story-grid{grid-template-columns:1fr}.story-grid>a.featured{grid-column:auto}.section-head{align-items:flex-start;flex-direction:column}}
+  @media(max-width:880px){.intro-grid{grid-template-columns:1fr;gap:38px}.resource-grid,.story-grid{grid-template-columns:1fr 1fr}.founder-media-grid{grid-template-columns:1fr;grid-template-rows:auto}.founder-media-grid>a,.founder-media-grid>a.lead-founder{grid-row:auto;grid-template-columns:180px 1fr;grid-template-rows:auto;min-height:220px}.contact-card{align-items:flex-start;flex-direction:column}}
+  @media(max-width:600px){.resource-grid,.story-grid{grid-template-columns:1fr}.story-grid>a.featured{grid-column:auto}.founder-media-grid>a,.founder-media-grid>a.lead-founder{grid-template-columns:1fr}.founder-visual{min-height:220px}.section-head{align-items:flex-start;flex-direction:column}}
 </style>
