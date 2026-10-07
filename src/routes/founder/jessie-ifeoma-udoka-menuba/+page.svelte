@@ -69,6 +69,13 @@
     : fallbackAchievements;
 
   const founder = data.founder;
+  const mediaPreview = data.media.slice(0, 4);
+
+  function mediaPhoto(item: (typeof data.media)[number]) {
+    return item.photos.find((photo) => photo.is_primary && photo.image_url) ??
+      item.photos.find((photo) => photo.image_url) ??
+      null;
+  }
 
   const education = [
     'BSc in Nursing',
@@ -171,6 +178,46 @@
   </div>
 </section>
 
+
+<section class="recognition-media">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Recognition, publications & photographs</p>
+        <h2 class="section-title">The founder’s public record as a living media archive.</h2>
+      </div>
+      <a class="archive-link" href="/founder/media">Open full recognition & media archive ↗</a>
+    </div>
+
+    {#if mediaPreview.length}
+      <div class="media-grid">
+        {#each mediaPreview as item, i}
+          {@const photo = mediaPhoto(item)}
+          <a class:lead={i === 0} href={`/founder/media/${item.slug}`}>
+            <div class="media-visual">
+              {#if photo}
+                <img src={photo.image_url} alt={photo.alt_text || item.title} loading={i === 0 ? 'eager' : 'lazy'} />
+              {:else}
+                <span>QT</span>
+              {/if}
+            </div>
+            <div class="media-copy">
+              <span>{item.kind.replace('-', ' ')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <small>{item.source_name} ↗</small>
+            </div>
+          </a>
+        {/each}
+      </div>
+    {:else}
+      <div class="media-empty">
+        Verified founder publications will appear here automatically when published through the Foundation archive.
+      </div>
+    {/if}
+  </div>
+</section>
+
 <section class="education">
   <div class="container education-grid">
     <div>
@@ -246,6 +293,22 @@
   .timeline p { max-width:780px; margin:10px 0 0; color:#a897a7; }
   .timeline a { display:inline-block; margin-top:12px; color:var(--gold-bright); font-size:.78rem; text-decoration:underline; text-underline-offset:3px; }
 
+  .recognition-media{padding:112px 0;background:var(--ivory);color:#2a1926}
+  .recognition-media .eyebrow{color:#8e6020}
+  .recognition-media .section-title{color:#341d31}
+  .archive-link{color:#8e6020;font-size:.82rem;font-weight:700}
+  .media-grid{display:grid;grid-template-columns:1.2fr .8fr;grid-template-rows:240px 240px 240px;gap:14px;margin-top:48px}
+  .media-grid>a{display:grid;grid-template-columns:180px 1fr;overflow:hidden;border:1px solid rgba(80,45,70,.12);border-radius:24px;background:#fff}
+  .media-grid>a.lead{grid-row:1/4;grid-template-columns:1fr;grid-template-rows:1.1fr .9fr}
+  .media-visual{min-height:0;display:grid;place-items:center;background:radial-gradient(circle at 70% 22%,rgba(225,189,106,.18),transparent 13rem),linear-gradient(145deg,#4b1552,#100611);color:var(--gold-bright);font:600 2.7rem/1 'Cormorant Garamond',Georgia,serif}
+  .media-visual img{width:100%;height:100%;object-fit:cover}
+  .media-copy{padding:22px}
+  .media-copy>span{color:#9b6c29;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+  .media-copy h3{margin:10px 0 7px;color:#43213f;font:600 1.55rem/1 'Cormorant Garamond',Georgia,serif}
+  .lead .media-copy h3{font-size:2.4rem}
+  .media-copy p{margin:0;color:#6d5b68;font-size:.82rem}
+  .media-copy small{display:block;margin-top:14px;color:#8e6020}
+  .media-empty{margin-top:42px;border:1px dashed rgba(80,45,70,.16);border-radius:20px;padding:30px;color:#6d5b68}
   .education { padding:112px 0; background:var(--cream); color:#2a1926; }
   .education-grid { display:grid; grid-template-columns:.95fr 1.05fr; gap:80px; }
   .education .eyebrow { color:#8e6020; }
@@ -263,6 +326,8 @@
 
   @media(max-width:900px){
     .note-card,.profile-grid,.education-grid{grid-template-columns:1fr;gap:44px}
+    .media-grid{grid-template-columns:1fr;grid-template-rows:auto}
+    .media-grid>a,.media-grid>a.lead{grid-row:auto;grid-template-columns:180px 1fr;grid-template-rows:auto;min-height:220px}
     .section-head,.press-card{align-items:flex-start;flex-direction:column}
   }
   @media(max-width:600px){
@@ -271,5 +336,7 @@
     .portrait-frame{min-height:420px}
     .timeline article{grid-template-columns:52px 1fr}
     .qualifications{grid-template-columns:1fr}
+    .media-grid>a,.media-grid>a.lead{grid-template-columns:1fr}
+    .media-visual{min-height:220px}
   }
 </style>
