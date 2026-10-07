@@ -134,7 +134,11 @@ class PartnerCollaborationViewSet(PublishedReadOnlyViewSet):
     ordering_fields = ["display_order", "starts_at", "published_at", "title"]
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(verified_record=True)
+        queryset = super().get_queryset().filter(
+            verified_record=True,
+            partner__status=PublishableModel.PublicationStatus.PUBLISHED,
+            partner__verified_relationship=True,
+        )
         partner_slug = self.request.query_params.get("partner", "").strip()
         if partner_slug:
             queryset = queryset.filter(partner__slug=partner_slug)
