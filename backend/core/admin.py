@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from .admin_dashboard import build_admin_dashboard_context
 from .models import (
     Announcement,
     Campaign,
@@ -822,4 +823,21 @@ class SupportRequestAdmin(admin.ModelAdmin):
 
 admin.site.site_header = "Queen Tovah Foundation Administration"
 admin.site.site_title = "Queen Tovah Admin"
-admin.site.index_title = "Content, programs and engagement"
+admin.site.index_title = "Executive operations"
+admin.site.index_template = "admin/queen_tovah_index.html"
+
+if not hasattr(admin.site, "_queen_tovah_original_index"):
+    admin.site._queen_tovah_original_index = admin.site.index
+
+
+def queen_tovah_admin_index(request, extra_context=None):
+    dashboard_context = build_admin_dashboard_context(request)
+    if extra_context:
+        dashboard_context.update(extra_context)
+    return admin.site._queen_tovah_original_index(
+        request,
+        extra_context=dashboard_context,
+    )
+
+
+admin.site.index = queen_tovah_admin_index
