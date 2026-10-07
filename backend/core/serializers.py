@@ -19,6 +19,7 @@ from .models import (
     ImpactStory,
     NewsletterSubscriber,
     Partner,
+    PartnerCollaboration,
     Program,
     Resource,
     Scholarship,
@@ -95,9 +96,40 @@ class ScholarshipSerializer(serializers.ModelSerializer):
 
 
 class PartnerSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField()
+
     class Meta:
         model = Partner
-        fields = ["title", "slug", "description", "website", "logo", "published_at"]
+        fields = [
+            "title", "slug", "partner_type", "relationship_status", "tagline",
+            "description", "body", "website", "logo", "hero_image", "hero_alt",
+            "city", "country", "location", "relationship_since",
+            "relationship_ended", "verified_relationship", "reference_url",
+            "featured", "seo_title", "seo_description", "seo_keywords",
+            "published_at",
+        ]
+
+    def get_location(self, obj):
+        return ", ".join(value for value in [obj.city, obj.country] if value)
+
+
+class PartnerCollaborationSerializer(serializers.ModelSerializer):
+    partner_slug = serializers.CharField(source="partner.slug", read_only=True)
+    partner_title = serializers.CharField(source="partner.title", read_only=True)
+    program_slug = serializers.CharField(source="program.slug", read_only=True, allow_null=True)
+    program_title = serializers.CharField(source="program.title", read_only=True, allow_null=True)
+    campaign_slug = serializers.CharField(source="campaign.slug", read_only=True, allow_null=True)
+    campaign_title = serializers.CharField(source="campaign.title", read_only=True, allow_null=True)
+
+    class Meta:
+        model = PartnerCollaboration
+        fields = [
+            "title", "slug", "summary", "body", "collaboration_status",
+            "partner_slug", "partner_title", "program_slug", "program_title",
+            "campaign_slug", "campaign_title", "starts_at", "ends_at",
+            "location_label", "featured", "verified_record", "source_url",
+            "seo_title", "seo_description", "seo_keywords", "published_at",
+        ]
 
 
 class CampaignSerializer(serializers.ModelSerializer):
@@ -354,6 +386,7 @@ class CampaignUpdateSerializer(serializers.ModelSerializer):
     campaign_title = serializers.CharField(source="campaign.title", read_only=True, allow_null=True)
     program_slug = serializers.CharField(source="program.slug", read_only=True, allow_null=True)
     program_title = serializers.CharField(source="program.title", read_only=True, allow_null=True)
+    partners = PartnerSerializer(many=True, read_only=True)
 
     class Meta:
         model = CampaignUpdate
@@ -361,7 +394,7 @@ class CampaignUpdateSerializer(serializers.ModelSerializer):
             "title", "slug", "kind", "summary", "body", "occurred_at",
             "location_label", "featured", "video_url",
             "campaign_slug", "campaign_title", "program_slug", "program_title",
-            "expenditure_amount", "expenditure_currency", "expenditure_note",
+            "partners", "expenditure_amount", "expenditure_currency", "expenditure_note",
             "expenditure_verified", "output_value", "output_unit", "output_note",
             "verification_note", "source_reference", "source_url", "media",
             "seo_title", "seo_description", "seo_keywords", "published_at",
