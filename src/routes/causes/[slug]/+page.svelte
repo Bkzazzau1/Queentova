@@ -1,7 +1,16 @@
 <script lang="ts">
   import PageHero from '$lib/components/PageHero.svelte';
   let { data } = $props();
-  const { campaign } = data;
+  const { campaign, updates } = data;
+
+  const updateLabels: Record<string,string> = {
+    field: 'Field update',
+    milestone: 'Milestone',
+    delivery: 'Delivery / distribution',
+    funding: 'Funding update',
+    impact: 'Impact update',
+    announcement: 'Announcement'
+  };
 
   function money(value: string | null) {
     if (!value) return '';
@@ -66,6 +75,43 @@
   </div>
 </section>
 
+{#if updates.length}
+<section class="journal">
+  <div class="container">
+    <div class="journal-head">
+      <div>
+        <p class="eyebrow">Implementation journal</p>
+        <h2>What happened after this cause was published.</h2>
+      </div>
+      <a href="/activity">Open full activity journal ↗</a>
+    </div>
+
+    <div class="updates">
+      {#each updates.slice(0, 4) as update}
+        <a href={`/activity/${update.slug}`}>
+          <div class="update-meta">
+            <span>{updateLabels[update.kind] || update.kind}</span>
+            <span>{new Intl.DateTimeFormat('en',{dateStyle:'medium'}).format(new Date(update.occurred_at))}</span>
+          </div>
+          <h3>{update.title}</h3>
+          <p>{update.summary}</p>
+          <div class="update-facts">
+            {#if update.output_value && update.output_unit}
+              <span>{Number(update.output_value).toLocaleString()} {update.output_unit}</span>
+            {/if}
+            {#if update.expenditure_amount && update.expenditure_verified}
+              <span>Verified expenditure</span>
+            {/if}
+            {#if update.location_label}<span>{update.location_label}</span>{/if}
+          </div>
+        </a>
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
+
+
 <style>
   .detail{padding:100px 0 120px;background:var(--ivory);color:#2b1827}
   .shell{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:56px;align-items:start}
@@ -82,5 +128,17 @@
   aside h2{margin:0;color:#44223f;font:600 2rem/1 'Cormorant Garamond',Georgia,serif}
   aside p{color:#6d5b68;font-size:.9rem}
   aside .btn{width:100%;margin-top:26px}
-  @media(max-width:850px){.shell{grid-template-columns:1fr}aside{position:static}}
+  .journal{padding:96px 0 110px;background:#0a040a}
+  .journal-head{display:flex;align-items:end;justify-content:space-between;gap:40px}
+  .journal-head .eyebrow{color:var(--gold-bright)}
+  .journal-head h2{max-width:780px;margin:0;color:var(--ivory);font:600 clamp(2.5rem,5vw,4rem)/.98 'Cormorant Garamond',Georgia,serif}
+  .journal-head>a{color:var(--gold-bright);font-size:.8rem;font-weight:700}
+  .updates{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:42px}
+  .updates>a{min-height:260px;display:flex;flex-direction:column;border:1px solid rgba(225,189,106,.15);border-radius:24px;padding:24px;background:rgba(255,255,255,.035)}
+  .update-meta,.update-facts{display:flex;flex-wrap:wrap;gap:8px 14px;color:#9d8b9a;font-size:.68rem}
+  .update-meta span:first-child{color:var(--gold-deep);font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+  .updates h3{margin:58px 0 10px;color:var(--champagne);font:600 1.9rem/1 'Cormorant Garamond',Georgia,serif}
+  .updates p{margin:0;color:#aa9aa8;font-size:.85rem}
+  .update-facts{margin-top:auto;padding-top:20px;color:#c0afbc}
+  @media(max-width:850px){.shell{grid-template-columns:1fr}aside{position:static}.journal-head{align-items:flex-start;flex-direction:column}.updates{grid-template-columns:1fr}}
 </style>
