@@ -17,6 +17,7 @@ from .views import (
     ImpactStoryViewSet,
     NewsletterSubscribeView,
     PartnerViewSet,
+    PartnerCollaborationViewSet,
     ProgramViewSet,
     ResourceViewSet,
     ScholarshipViewSet,
@@ -41,6 +42,7 @@ router.register("impact", ImpactMetricViewSet, basename="impact")
 router.register("impact-stories", ImpactStoryViewSet, basename="impact-story")
 router.register("scholarships", ScholarshipViewSet, basename="scholarship")
 router.register("partners", PartnerViewSet, basename="partner")
+router.register("partner-collaborations", PartnerCollaborationViewSet, basename="partner-collaboration")
 router.register("resources", ResourceViewSet, basename="resource")
 router.register("campaigns", CampaignViewSet, basename="campaign")
 router.register("activity-updates", CampaignUpdateViewSet, basename="activity-update")
