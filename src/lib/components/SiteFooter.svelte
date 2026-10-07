@@ -51,6 +51,7 @@
       <a href="/founder/media">Founder Recognition & Media</a>
       <a href="/impact">Impact & Accountability</a>
       <a href="/activity">Activity Journal</a>
+      <a href="/partners">Partners & Institutions</a>
       <a href="/impact-stories">Stories of Impact</a>
       <a href="/governance">Governance & Transparency</a>
       <a href="/news">Stories</a>
