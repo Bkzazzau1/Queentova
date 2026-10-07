@@ -61,6 +61,7 @@
   const featuredScholarship = data.scholarships.find((item) => item.application_status === 'open') ?? data.scholarships[0] ?? null;
   const latestStories = data.stories.slice(0, 3);
   const visiblePartners = data.partners.slice(0, 6);
+  const homepageSpotlights = data.spotlights.slice(0, 2);
 
   const principles = [
     ['Global outlook', 'Service is not confined by geography; compassion should reach wherever it is genuinely needed.'],
@@ -123,6 +124,46 @@
     <span>Global outreach</span>
   </div>
 </section>
+
+
+{#if homepageSpotlights.length}
+<section class="curated-spotlights" aria-label="Featured Foundation updates">
+  <div class="container">
+    <div class="spotlight-heading">
+      <div>
+        <p class="eyebrow">Selected by the Foundation</p>
+        <h2 class="section-title">What deserves your attention now.</h2>
+      </div>
+      <p>
+        This area is curated from the Foundation administration system and can be scheduled without
+        changing the website code.
+      </p>
+    </div>
+
+    <div class:single={homepageSpotlights.length === 1} class="spotlight-grid">
+      {#each homepageSpotlights as spotlight, index}
+        <article class:primary={index === 0} class:with-image={Boolean(spotlight.image)} class:campaign={spotlight.style === 'campaign'} class:opportunity={spotlight.style === 'opportunity'}>
+          {#if spotlight.image}
+            <img src={spotlight.image} alt={spotlight.image_alt || spotlight.title} loading={index === 0 ? 'eager' : 'lazy'} />
+          {/if}
+          <div class="spotlight-shade"></div>
+          <div class="spotlight-content">
+            <span>{spotlight.eyebrow || (spotlight.style === 'impact' ? 'Impact' : spotlight.style === 'campaign' ? 'Featured cause' : spotlight.style === 'opportunity' ? 'Opportunity' : 'Featured')}</span>
+            <h3>{spotlight.title}</h3>
+            <p>{spotlight.summary}</p>
+            <div class="spotlight-actions">
+              <a class="spotlight-primary" href={spotlight.link_url}>{spotlight.link_label || 'Explore'} ↗</a>
+              {#if spotlight.secondary_url && spotlight.secondary_label}
+                <a class="spotlight-secondary" href={spotlight.secondary_url}>{spotlight.secondary_label}</a>
+              {/if}
+            </div>
+          </div>
+        </article>
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
 
 <section class="about" id="about">
   <div class="container about-grid">
@@ -558,6 +599,149 @@
     margin-left: 28px;
     color: var(--gold-deep);
     content: '•';
+  }
+
+
+  .curated-spotlights {
+    padding: 92px 0;
+    background: #0a040a;
+  }
+
+  .spotlight-heading {
+    display: grid;
+    grid-template-columns: 1fr .72fr;
+    align-items: end;
+    gap: 70px;
+    margin-bottom: 42px;
+  }
+
+  .spotlight-heading .section-title {
+    max-width: 780px;
+  }
+
+  .spotlight-heading > p {
+    margin: 0 0 6px;
+    color: #aa9aa8;
+  }
+
+  .spotlight-grid {
+    display: grid;
+    grid-template-columns: 1.35fr .85fr;
+    min-height: 520px;
+    gap: 16px;
+  }
+
+  .spotlight-grid.single {
+    grid-template-columns: 1fr;
+  }
+
+  .spotlight-grid article {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 520px;
+    display: flex;
+    align-items: flex-end;
+    border: 1px solid rgba(225, 189, 106, .18);
+    border-radius: 30px;
+    padding: 34px;
+    background:
+      radial-gradient(circle at 72% 20%, rgba(225, 189, 106, .17), transparent 18rem),
+      linear-gradient(145deg, #4d1554, #100611);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, .22);
+  }
+
+  .spotlight-grid article:not(.primary) {
+    min-height: 520px;
+    background:
+      radial-gradient(circle at 72% 20%, rgba(225, 189, 106, .10), transparent 16rem),
+      linear-gradient(145deg, #29102d, #0e060f);
+  }
+
+  .spotlight-grid article.campaign {
+    background:
+      radial-gradient(circle at 78% 18%, rgba(225, 189, 106, .20), transparent 18rem),
+      linear-gradient(145deg, #5a2d13, #170a08);
+  }
+
+  .spotlight-grid article.opportunity {
+    background:
+      radial-gradient(circle at 80% 18%, rgba(225, 189, 106, .18), transparent 17rem),
+      linear-gradient(145deg, #39143f, #0c0812);
+  }
+
+  .spotlight-grid article img {
+    position: absolute;
+    z-index: -3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .spotlight-shade {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(7, 2, 7, .94), rgba(7, 2, 7, .14) 72%);
+  }
+
+  .spotlight-grid article:not(.with-image) .spotlight-shade {
+    background: linear-gradient(0deg, rgba(7, 2, 7, .52), transparent 72%);
+  }
+
+  .spotlight-content {
+    max-width: 720px;
+  }
+
+  .spotlight-content > span {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: var(--gold-bright);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+  }
+
+  .spotlight-content h3 {
+    margin: 0;
+    color: var(--ivory);
+    font: 600 clamp(2.4rem, 4.8vw, 4.4rem)/.94 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: -.025em;
+  }
+
+  .spotlight-grid article:not(.primary) .spotlight-content h3 {
+    font-size: clamp(2.1rem, 3.6vw, 3.15rem);
+  }
+
+  .spotlight-content p {
+    max-width: 650px;
+    margin: 16px 0 0;
+    color: #c7bac5;
+  }
+
+  .spotlight-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-top: 25px;
+  }
+
+  .spotlight-primary {
+    border-radius: 999px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: #180b17;
+    font-size: .78rem;
+    font-weight: 800;
+  }
+
+  .spotlight-secondary {
+    color: var(--champagne);
+    font-size: .78rem;
+    font-weight: 700;
   }
 
   .about {
