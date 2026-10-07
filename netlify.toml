@@ -1,0 +1,9 @@
+# Netlify build settings for the SvelteKit public website.
+# The Django backend (backend/) is deployed separately; point the site at it
+# by setting PUBLIC_API_BASE_URL in Netlify > Site configuration > Environment variables.
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "22"

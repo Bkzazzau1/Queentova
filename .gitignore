@@ -13,3 +13,4 @@ backend/media/
 backend/staticfiles/
 *.pyc
 .DS_Store
+.netlify/
