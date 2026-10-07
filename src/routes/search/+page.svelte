@@ -15,7 +15,8 @@
     resource: 'Resource',
     faq: 'FAQ',
     'impact-story': 'Story of Impact',
-    'founder-media': 'Founder Recognition & Media'
+    'founder-media': 'Founder Recognition & Media',
+    'activity-update': 'Activity Update'
   };
 </script>
 
