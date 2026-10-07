@@ -1,10 +1,11 @@
 from datetime import timedelta
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, FAQ, HomepageSpotlight, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, FAQ, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -182,3 +183,81 @@ class PublicApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         slugs = [item["slug"] for item in response.data["results"]]
         self.assertEqual(slugs, ["live-spotlight"])
+
+
+    def test_impact_story_api_exposes_only_active_consented_stories(self):
+        now = timezone.now()
+        visible = ImpactStory.objects.create(
+            title="A consented impact story",
+            slug="consented-impact-story",
+            excerpt="A verified story shared with consent.",
+            body="The public body.",
+            consent_status=ImpactStory.ConsentStatus.ACTIVE,
+            story_consent=True,
+            privacy_reviewed=True,
+            consent_reference="CONSENT-001",
+            consent_recorded_at=now,
+            status="published",
+        )
+        hidden = ImpactStory.objects.create(
+            title="A story later withdrawn",
+            slug="withdrawn-impact-story",
+            excerpt="This should disappear.",
+            body="Private after withdrawal.",
+            consent_status=ImpactStory.ConsentStatus.ACTIVE,
+            story_consent=True,
+            privacy_reviewed=True,
+            consent_reference="CONSENT-002",
+            consent_recorded_at=now,
+            status="published",
+        )
+        ImpactStory.objects.filter(pk=hidden.pk).update(
+            consent_status=ImpactStory.ConsentStatus.WITHDRAWN
+        )
+
+        response = self.client.get("/api/v1/impact-stories/")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertIn(visible.slug, slugs)
+        self.assertNotIn(hidden.slug, slugs)
+
+    def test_impact_story_public_serializer_hides_identity_by_default(self):
+        now = timezone.now()
+        ImpactStory.objects.create(
+            title="Protected identity",
+            slug="protected-identity",
+            excerpt="Identity is protected.",
+            body="A public-safe narrative.",
+            approved_display_name="Private Full Name",
+            identity_mode=ImpactStory.IdentityMode.ANONYMOUS,
+            consent_status=ImpactStory.ConsentStatus.ACTIVE,
+            story_consent=True,
+            privacy_reviewed=True,
+            consent_reference="CONSENT-003",
+            consent_recorded_at=now,
+            status="published",
+        )
+
+        response = self.client.get("/api/v1/impact-stories/protected-identity/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["public_name"], "Identity protected")
+        self.assertNotIn("consent_reference", response.data)
+        self.assertNotIn("approved_display_name", response.data)
+
+    def test_minor_impact_story_requires_guardian_consent_before_publication(self):
+        story = ImpactStory(
+            title="Minor story",
+            slug="minor-story",
+            excerpt="Protected.",
+            body="Protected narrative.",
+            is_minor=True,
+            consent_status=ImpactStory.ConsentStatus.ACTIVE,
+            story_consent=True,
+            privacy_reviewed=True,
+            consent_reference="CONSENT-004",
+            consent_recorded_at=timezone.now(),
+            status="published",
+        )
+
+        with self.assertRaises(ValidationError):
+            story.full_clean()
