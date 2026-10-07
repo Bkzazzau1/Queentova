@@ -11,6 +11,7 @@ from .models import (
     GalleryItem,
     HomepageSpotlight,
     ImpactMetric,
+    ImpactStory,
     NewsletterSubscriber,
     Partner,
     Program,
@@ -227,3 +228,45 @@ class HomepageSpotlightSerializer(serializers.ModelSerializer):
             "style", "starts_at", "ends_at", "priority", "display_order",
             "published_at",
         ]
+
+
+class ImpactStorySerializer(serializers.ModelSerializer):
+    public_name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    quote = serializers.SerializerMethodField()
+    quote_attribution = serializers.SerializerMethodField()
+    shared_with_consent = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ImpactStory
+        fields = [
+            "title", "slug", "excerpt", "body", "program_area", "public_name",
+            "age_group", "location_label", "image", "image_alt", "quote",
+            "quote_attribution", "featured", "shared_with_consent",
+            "seo_title", "seo_description", "seo_keywords", "published_at",
+        ]
+
+    def get_public_name(self, obj):
+        if obj.identity_mode == ImpactStory.IdentityMode.ANONYMOUS:
+            return "Identity protected"
+        return obj.approved_display_name.strip()
+
+    def get_image(self, obj):
+        if not obj.photo_consent or not obj.image:
+            return None
+        request = self.context.get("request")
+        url = obj.image.url
+        return request.build_absolute_uri(url) if request else url
+
+    def get_quote(self, obj):
+        return obj.quote if obj.quote_consent else ""
+
+    def get_quote_attribution(self, obj):
+        if not obj.quote_consent or not obj.quote:
+            return ""
+        if obj.quote_attribution.strip():
+            return obj.quote_attribution.strip()
+        return self.get_public_name(obj)
+
+    def get_shared_with_consent(self, obj):
+        return True
