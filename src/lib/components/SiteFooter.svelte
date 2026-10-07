@@ -48,6 +48,7 @@
       <a href="/about">About the Foundation</a>
       <a href="/programs">Our Programs</a>
       <a href="/causes">Causes</a>
+      <a href="/founder/media">Founder Recognition & Media</a>
       <a href="/impact">Impact & Accountability</a>
       <a href="/impact-stories">Stories of Impact</a>
       <a href="/governance">Governance & Transparency</a>
