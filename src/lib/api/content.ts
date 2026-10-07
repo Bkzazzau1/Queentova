@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media' | 'activity-update' | 'partner';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'scholarship' | 'resource' | 'faq' | 'impact-story' | 'founder-media' | 'activity-update' | 'partner';
   title: string;
   excerpt: string;
   url: string;
@@ -243,16 +243,97 @@ export async function searchSite(fetcher: Fetcher, query: string): Promise<Searc
 }
 
 
+export interface ScholarshipResultsSummary {
+  applications_received: number;
+  eligible: number;
+  shortlisted: number;
+  selected: number;
+  max_awards: number | null;
+}
+
 export interface Scholarship {
   title: string;
   slug: string;
   summary: string;
   eligibility: string;
+  application_instructions: string;
+  required_documents: string;
   application_status: 'upcoming' | 'open' | 'closed';
   opens_at: string | null;
   closes_at: string | null;
   application_url: string;
+  internal_applications_enabled: boolean;
+  internal_applications_open: boolean;
+  max_awards: number | null;
+  public_results_released: boolean;
+  public_results_note: string;
+  results_summary: ScholarshipResultsSummary | null;
   published_at: string | null;
+}
+
+export interface ScholarshipApplicationReceipt {
+  reference_code: string;
+  status: string;
+  status_label: string;
+  scholarship: string;
+  submitted_at: string;
+}
+
+export interface ScholarshipApplicationStatusResult {
+  reference_code: string;
+  scholarship: string;
+  status: string;
+  status_label: string;
+  submitted_at: string;
+  reviewed_at: string | null;
+}
+
+export async function submitScholarshipApplication(
+  slug: string,
+  formData: FormData
+): Promise<ScholarshipApplicationReceipt> {
+  const response = await fetch(
+    `${baseUrl()}/scholarships/${encodeURIComponent(slug)}/apply/`,
+    {
+      method: 'POST',
+      body: formData
+    }
+  );
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const message =
+      data?.email?.[0] ||
+      data?.consent_to_processing?.[0] ||
+      data?.declaration_true?.[0] ||
+      data?.non_field_errors?.[0] ||
+      data?.detail ||
+      'Unable to submit the scholarship application.';
+    throw new Error(message);
+  }
+
+  return await response.json();
+}
+
+export async function checkScholarshipApplicationStatus(
+  referenceCode: string,
+  email: string
+): Promise<ScholarshipApplicationStatusResult> {
+  const response = await fetch(`${baseUrl()}/scholarship-application-status/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      reference_code: referenceCode,
+      email
+    })
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data?.detail || 'Application not found.');
+  }
+
+  return await response.json();
 }
 
 export interface Partner {
