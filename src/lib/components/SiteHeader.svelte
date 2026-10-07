@@ -31,6 +31,7 @@
   const moreLinks = [
     { label: 'Founder', href: '/founder/jessie-ifeoma-udoka-menuba' },
     { label: 'Impact & Accountability', href: '/impact' },
+    { label: 'Stories of Impact', href: '/impact-stories' },
     { label: 'Governance & Transparency', href: '/governance' },
     { label: 'Scholarships', href: '/scholarships' },
     { label: 'Request Support', href: '/request-support' },
