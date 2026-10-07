@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -320,3 +320,95 @@ class PublicApiTests(TestCase):
             response.data["photos"][0]["image_url"],
             "https://independent.ng/wp-content/uploads/example.jpg",
         )
+
+
+    def test_activity_update_api_filters_by_campaign(self):
+        campaign = Campaign.objects.create(
+            title="Water Relief",
+            slug="water-relief",
+            summary="Emergency water relief.",
+            status="published",
+        )
+        other_campaign = Campaign.objects.create(
+            title="Education Relief",
+            slug="education-relief",
+            summary="Education support.",
+            status="published",
+        )
+        now = timezone.now()
+
+        CampaignUpdate.objects.create(
+            title="Water delivery completed",
+            slug="water-delivery-completed",
+            campaign=campaign,
+            kind="delivery",
+            summary="A verified field delivery update.",
+            occurred_at=now,
+            status="published",
+        )
+        CampaignUpdate.objects.create(
+            title="School materials delivered",
+            slug="school-materials-delivered",
+            campaign=other_campaign,
+            kind="delivery",
+            summary="A separate campaign update.",
+            occurred_at=now,
+            status="published",
+        )
+
+        response = self.client.get("/api/v1/activity-updates/?campaign=water-relief")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertEqual(slugs, ["water-delivery-completed"])
+
+    def test_activity_update_rejects_unverified_public_expenditure(self):
+        campaign = Campaign.objects.create(
+            title="Food Relief",
+            slug="food-relief",
+            summary="Food assistance.",
+            status="published",
+        )
+        update = CampaignUpdate(
+            title="Food purchase",
+            slug="food-purchase",
+            campaign=campaign,
+            kind="funding",
+            summary="A financial field update.",
+            occurred_at=timezone.now(),
+            expenditure_amount="5000.00",
+            expenditure_currency="USD",
+            expenditure_verified=False,
+            verification_note="",
+            status="published",
+        )
+
+        with self.assertRaises(ValidationError):
+            update.full_clean()
+
+    def test_activity_update_hides_unapproved_external_media(self):
+        program = Program.objects.create(
+            title="Youth Program",
+            slug="youth-program",
+            summary="Youth empowerment.",
+            status="published",
+        )
+        update = CampaignUpdate.objects.create(
+            title="Youth field update",
+            slug="youth-field-update",
+            program=program,
+            kind="field",
+            summary="A program activity update.",
+            occurred_at=timezone.now(),
+            status="published",
+        )
+        CampaignUpdateMedia.objects.create(
+            update=update,
+            media_type="photo",
+            external_url="https://example.com/photo.jpg",
+            alt_text="Candidate photo",
+            reuse_approved=False,
+        )
+
+        response = self.client.get("/api/v1/activity-updates/youth-field-update/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["media"], [])
