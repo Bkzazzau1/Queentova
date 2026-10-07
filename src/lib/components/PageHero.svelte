@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BrandCrest from './BrandCrest.svelte';
   let {
     eyebrow,
     title,
@@ -15,7 +16,7 @@
       <h1>{title} {#if accent}<span>{accent}</span>{/if}</h1>
       <p class="copy">{copy}</p>
     </div>
-    <img src="/brand/queen-tovah-crest.webp" alt="" aria-hidden="true" width="520" height="419" />
+    <div class="crest"><BrandCrest /></div>
   </div>
 </section>
 
@@ -72,9 +73,8 @@
     font-size: 1.05rem;
   }
 
-  img {
+  .crest {
     width: 100%;
-    height: auto;
     filter: drop-shadow(0 20px 40px rgba(201, 151, 63, 0.16));
   }
 
@@ -88,7 +88,7 @@
       gap: 38px;
     }
 
-    img {
+    .crest {
       width: min(200px, 56vw);
     }
   }

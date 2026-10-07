@@ -28,7 +28,7 @@
         name: 'Queen Tovah Cares Foundation International',
         logo: {
           '@type': 'ImageObject',
-          url: `${page.url.origin}/brand/queen-tovah-icon.png`
+          url: `${page.url.origin}/brand/queentova.png`
         }
       }
     }).replace(/</g, '\\u003c')

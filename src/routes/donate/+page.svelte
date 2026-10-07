@@ -58,8 +58,8 @@
       <h2>We will never publish unverified payment details.</h2>
       <p>
         {profile?.donation_url
-          ? 'The official giving button on this page is controlled from the Foundation administration profile.'
-          : 'No public payment gateway has been approved in the Foundation profile yet. Never send money to an account claiming to represent the Foundation unless it is confirmed here.'}
+          ? 'The giving channel on this page is the only official way to give. Never send money to an account claiming to represent the Foundation unless it is confirmed here.'
+          : 'Online giving is not open yet. Never send money to an account claiming to represent the Foundation unless it is confirmed here.'}
       </p>
     </div>
     {#if profile?.donation_url}

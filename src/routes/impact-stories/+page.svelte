@@ -128,8 +128,7 @@
       <p class="eyebrow">Consent is not permanent ownership</p>
       <h2>A person can withdraw permission to share their story.</h2>
       <p>
-        When consent is withdrawn in the Foundation administration system, the story is removed from the
-        public impact-story API and unpublished from this website.
+        When someone withdraws consent, their story is promptly removed from this website.
       </p>
     </div>
     <a class="btn btn-secondary" href="/governance">Governance & transparency</a>

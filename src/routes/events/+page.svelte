@@ -59,7 +59,7 @@
     {:else}
       <div class="empty card">
         <h3>No public event is scheduled yet.</h3>
-        <p>When an event is approved in the Foundation admin, it will appear here automatically.</p>
+        <p>Upcoming Foundation events will be announced here.</p>
       </div>
     {/if}
 

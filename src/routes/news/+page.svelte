@@ -32,7 +32,7 @@
   eyebrow="News & stories"
   title="Stories of service,"
   accent="care and community."
-  copy="Verified Foundation activities, partnerships, humanitarian interventions and community stories are published here through our editorial content system."
+  copy="Verified Foundation activities, partnerships, humanitarian interventions and community stories."
 />
 
 <section class="stories">
@@ -54,7 +54,7 @@
             {featured.source_name || 'Source'} ↗
           </a>
         {:else}
-          <span class="status">Additional verified stories and official photography are added through the Foundation admin.</span>
+          <span class="status">More stories and official photography will be shared here.</span>
         {/if}
       </div>
     </article>
@@ -75,7 +75,7 @@
     <div class="coming">
       <p class="eyebrow">Editorial standard</p>
       <h3>Only reviewed and published Foundation stories appear publicly.</h3>
-      <p>Drafts remain private inside the admin until they complete the review and publication workflow.</p>
+      <p>Every story is reviewed before publication, so what you read reflects the Foundation's real work.</p>
     </div>
   </div>
 </section>

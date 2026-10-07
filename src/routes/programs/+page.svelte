@@ -72,8 +72,6 @@
           <ul>
             {#each program.points as point}<li>{point}</li>{/each}
           </ul>
-        {:else}
-          <div class="managed-note">Managed through the Foundation content system.</div>
         {/if}
       </article>
     {/each}
@@ -99,10 +97,9 @@
   ul{margin:8px 0 0;padding:0;list-style:none}
   li{position:relative;border-bottom:1px solid rgba(80,45,70,.08);padding:9px 0 9px 20px;color:#755f70;font-size:.9rem}
   li::before{position:absolute;left:0;color:#a8762c;content:'✦'}
-  .managed-note{align-self:start;margin-top:8px;color:#9a887f;font-size:.8rem}
   .principle{padding:90px 0;background:#0a040a}
   .principle-card{border:1px solid rgba(225,189,106,.22);border-radius:32px;padding:54px;background:radial-gradient(circle at 85% 20%,rgba(201,151,63,.14),transparent 24rem),linear-gradient(135deg,rgba(100,25,111,.25),rgba(255,255,255,.02))}
   .principle-card h2{max-width:850px;color:var(--ivory);font-size:clamp(2.5rem,5vw,4.6rem)}
   .principle-card .btn{margin-top:30px}
-  @media(max-width:800px){.program{grid-template-columns:44px 1fr}.program ul,.managed-note{grid-column:2}.principle-card{padding:34px 24px}}
+  @media(max-width:800px){.program{grid-template-columns:44px 1fr}.program ul{grid-column:2}.principle-card{padding:34px 24px}}
 </style>

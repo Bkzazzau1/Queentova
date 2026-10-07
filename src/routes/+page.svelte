@@ -104,14 +104,13 @@
       <div class="identity-glow"></div>
       <img
         class="official-logo"
-        src="/brand/queen-tovah-logo-full.webp"
+        src="/brand/queentova.png"
         alt="Queen Tovah Cares Foundation International logo"
-        width="840"
-        height="560"
+        width="1536"
+        height="1024"
       />
       <div class="identity-caption">
         <span>Global humanitarian service</span>
-        <strong>It is good to be good.</strong>
       </div>
     </div>
   </div>
@@ -262,7 +261,7 @@
         <p class="eyebrow">The mission, live</p>
         <h2 class="section-title">More ways to take part.</h2>
       </div>
-      <p class="section-copy">Causes, events and opportunities are published from the Foundation's verified content system.</p>
+      <p class="section-copy">Causes, events and opportunities to stand with the Foundation's work.</p>
     </div>
 
     <div class="live-grid">
@@ -274,6 +273,15 @@
             <p>{featuredCampaign.summary}</p>
           </div>
           <span class="live-action">Explore cause ↗</span>
+        </a>
+      {:else}
+        <a class="live-card campaign-card" href="/donate">
+          <span class="live-label">Support the mission</span>
+          <div>
+            <h3>Help goodness travel further.</h3>
+            <p>Give, sponsor or partner with the Foundation through verified channels.</p>
+          </div>
+          <span class="live-action">Ways to support ↗</span>
         </a>
       {/if}
 
@@ -287,6 +295,15 @@
           </div>
           <span class="live-action">Event details ↗</span>
         </a>
+      {:else}
+        <a class="live-card" href="/request-support">
+          <span class="live-label">Request support</span>
+          <div>
+            <h3>Reach out when help is needed.</h3>
+            <p>Individuals, families and communities can ask the Foundation for humanitarian support.</p>
+          </div>
+          <span class="live-action">Request support ↗</span>
+        </a>
       {/if}
 
       {#if featuredScholarship}
@@ -297,6 +314,15 @@
             <p>{featuredScholarship.summary}</p>
           </div>
           <span class="live-action">View opportunity ↗</span>
+        </a>
+      {:else}
+        <a class="live-card scholarship-card" href="/scholarships">
+          <span class="live-label">Education</span>
+          <div>
+            <h3>Scholarships that open doors.</h3>
+            <p>See how the Foundation supports indigent students and announces new opportunities.</p>
+          </div>
+          <span class="live-action">Explore scholarships ↗</span>
         </a>
       {/if}
 
@@ -522,20 +548,19 @@
     flex-direction: column;
     justify-content: center;
     padding: 36px;
-    border-color: rgba(225, 189, 106, 0.32);
+    border-color: rgba(225, 189, 106, 0.55);
     background:
-      radial-gradient(circle at 50% 30%, rgba(225, 189, 106, 0.16), transparent 28%),
-      radial-gradient(circle at 55% 52%, rgba(100, 25, 111, 0.4), transparent 42%),
-      linear-gradient(145deg, rgba(57, 16, 62, 0.82), rgba(6, 2, 6, 0.94));
+      radial-gradient(circle at 50% 42%, #fffaf2 0%, #fbf1dc 46%, #efdcb0 100%);
     box-shadow:
-      0 36px 100px rgba(0, 0, 0, 0.38),
-      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      0 36px 100px rgba(0, 0, 0, 0.45),
+      0 0 0 6px rgba(225, 189, 106, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   .identity::before,
   .identity::after {
     position: absolute;
-    border: 1px solid rgba(225, 189, 106, 0.12);
+    border: 1px solid rgba(139, 98, 35, 0.16);
     border-radius: 50%;
     content: '';
   }
@@ -555,7 +580,7 @@
     inset: auto 12% -12%;
     height: 180px;
     border-radius: 50%;
-    background: rgba(201, 151, 63, 0.16);
+    background: rgba(201, 151, 63, 0.22);
     filter: blur(50px);
   }
 
@@ -576,20 +601,13 @@
   }
 
   .identity-caption span {
-    color: #a996a8;
+    color: #8b6223;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.13em;
     text-transform: uppercase;
   }
 
-  .identity-caption strong {
-    color: var(--champagne);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.28rem;
-    font-style: italic;
-    font-weight: 600;
-  }
 
   .trust-strip {
     display: flex;

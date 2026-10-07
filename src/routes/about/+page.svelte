@@ -57,7 +57,7 @@
     <div class="portrait">
       <div class="portrait-inner">
         <span class="crown">♛</span>
-        <p>Official founder portrait will be added here.</p>
+        <p>Founder portrait</p>
       </div>
     </div>
     <div>

@@ -100,8 +100,8 @@
           <div class="privacy-note">
             <strong>Private by design</strong>
             <p>
-              Uploaded files are stored as application records and are not exposed by public
-              scholarship APIs or the public status checker.
+              Uploaded files are kept confidential with your application and are never shown
+              publicly, including on the status checker.
             </p>
           </div>
         </aside>

@@ -91,8 +91,8 @@
     </div>
     <div>
       <p>
-        Foundation-managed applications receive a private reference code. Scores, reviewer notes and
-        uploaded documents are never exposed by the public scholarship API.
+        Every application receives a private reference code. Scores, reviewer notes and uploaded
+        documents are kept confidential and never shown publicly.
       </p>
       <a href="/scholarships/status">Track an application securely ↗</a>
     </div>

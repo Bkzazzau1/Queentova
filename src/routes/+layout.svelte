@@ -23,7 +23,7 @@
       '@type': 'NGO',
       name: data.siteProfile?.display_name || 'Queen Tovah Cares Foundation International',
       url: page.url.origin,
-      logo: `${page.url.origin}/brand/queen-tovah-icon.png`,
+      logo: `${page.url.origin}/brand/queentova.png`,
       description:
         data.siteProfile?.short_description ||
         'Queen Tovah Cares Foundation International advances humanitarian support, education, youth empowerment and community development.',

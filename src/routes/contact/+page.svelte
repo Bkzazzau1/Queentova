@@ -52,8 +52,7 @@
       <p class="eyebrow">Get in touch</p>
       <h2 class="section-title">Partnership begins with a clear purpose.</h2>
       <p>
-        Send a message through the secure Foundation enquiry system. Public contact details below appear
-        only when they have been approved in the Foundation administration profile.
+        Send a message using the secure form and the Foundation team will respond to your enquiry.
       </p>
 
       {#if profile?.contact_email || profile?.phone || profile?.whatsapp || profile?.office_address}

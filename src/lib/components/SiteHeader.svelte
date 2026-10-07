@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Announcement } from '$lib/api/content';
+  import BrandCrest from './BrandCrest.svelte';
 
   let { announcement = null }: { announcement?: Announcement | null } = $props();
   let open = $state(false);
@@ -70,7 +71,7 @@
 
   <div class="container nav">
     <a class="brand" href="/" aria-label="Queen Tovah Cares Foundation International home">
-      <img class="brand-logo" src="/brand/queen-tovah-crest.webp" alt="" width="520" height="419" />
+      <span class="brand-logo"><BrandCrest /></span>
       <span class="brand-copy">
         <strong>Queen Tovah</strong>
         <small>Cares Foundation International</small>
@@ -218,10 +219,8 @@
   }
 
   .brand-logo {
-    width: auto;
-    height: 52px;
+    width: 60px;
     flex-shrink: 0;
-    filter: drop-shadow(0 4px 12px rgba(201, 151, 63, 0.18));
   }
 
   .brand-copy {
@@ -452,7 +451,7 @@
     }
 
     .brand-logo {
-      height: 44px;
+      width: 50px;
     }
   }
 </style>

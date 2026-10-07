@@ -67,7 +67,7 @@
       <div class="empty card">
         <span class="mark">QT</span>
         <h2>Verified causes will appear here.</h2>
-        <p>The Foundation admin can publish campaigns without inventing fundraising totals or payment details.</p>
+        <p>New causes are announced here once they are confirmed by the Foundation.</p>
       </div>
     {/if}
   </div>

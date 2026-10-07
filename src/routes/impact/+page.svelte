@@ -44,8 +44,8 @@
       <p class="eyebrow">Our approach</p>
       <h2 class="section-title">Care that is responsible, not performative.</h2>
       <p class="section-copy">
-        We do not publish invented impact numbers. Only metrics approved through the Foundation admin
-        and accompanied by a verification note can appear in the public impact section.
+        We do not publish invented impact numbers. Every figure shown here is verified and
+        accompanied by a note explaining where it comes from.
       </p>
     </div>
     <div class="steps">

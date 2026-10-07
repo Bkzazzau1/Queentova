@@ -94,7 +94,7 @@
       <div class="empty card">
         <span>QT</span>
         <h2>Published answers will appear here.</h2>
-        <p>The Foundation can manage frequently asked questions in the admin without editing website code.</p>
+        <p>Have a question we have not answered yet? The Foundation team is happy to help.</p>
         <a class="btn btn-primary" href="/contact">Ask the Foundation</a>
       </div>
     {/if}

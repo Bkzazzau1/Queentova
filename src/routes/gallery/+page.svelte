@@ -14,7 +14,7 @@
   eyebrow="Gallery"
   title="The mission,"
   accent="documented with dignity."
-  copy="Official Foundation photography and video are managed through the Foundation content system. Unapproved or stock images are not presented as Foundation activity."
+  copy="Official photography and video from Foundation activities. Stock images are never presented as Foundation work."
 />
 
 <section class="gallery">

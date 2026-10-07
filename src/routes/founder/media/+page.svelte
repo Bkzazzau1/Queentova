@@ -118,7 +118,7 @@
         {/each}
       {:else}
         <div class="empty">
-          Verified founder media records will appear here after publication through the Foundation admin.
+          Verified recognition, publications and photographs will appear here as they are added.
         </div>
       {/if}
     </div>

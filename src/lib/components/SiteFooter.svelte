@@ -1,5 +1,6 @@
 <script lang="ts">
   import { subscribeNewsletter, type SiteProfile } from '$lib/api/content';
+  import BrandCrest from './BrandCrest.svelte';
 
   let { profile = null }: { profile?: SiteProfile | null } = $props();
 
@@ -28,7 +29,7 @@
 <footer id="contact">
   <div class="container footer-grid">
     <div class="intro">
-      <img class="footer-logo" src="/brand/queen-tovah-crest.webp" width="520" height="419" alt="Queen Tovah Cares Foundation International logo" />
+      <div class="footer-logo"><BrandCrest label="Queen Tovah Cares Foundation International logo" /></div>
       <h2>{profile?.display_name || 'Queen Tovah Cares Foundation International'}</h2>
       <p>
         {profile?.short_description || 'Compassion with dignity. Opportunity with purpose. A global outlook rooted in service to people and communities.'}
@@ -119,9 +120,7 @@
   }
 
   .footer-logo {
-    width: 120px;
-    height: auto;
-    margin-left: -10px;
+    width: 104px;
   }
 
   h2 {
