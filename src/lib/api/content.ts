@@ -324,3 +324,23 @@ export interface FAQItem {
   display_order: number;
   published_at: string | null;
 }
+
+
+export interface HomepageSpotlight {
+  eyebrow: string;
+  title: string;
+  slug: string;
+  summary: string;
+  image: string | null;
+  image_alt: string;
+  link_label: string;
+  link_url: string;
+  secondary_label: string;
+  secondary_url: string;
+  style: 'editorial' | 'impact' | 'campaign' | 'opportunity';
+  starts_at: string | null;
+  ends_at: string | null;
+  priority: number;
+  display_order: number;
+  published_at: string | null;
+}
