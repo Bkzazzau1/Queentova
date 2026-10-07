@@ -70,7 +70,7 @@
 
   <div class="container nav">
     <a class="brand" href="/" aria-label="Queen Tovah Cares Foundation International home">
-      <img class="brand-logo" src="/brand/queen-tovah-crest.webp" alt="" width="260" height="196" />
+      <img class="brand-logo" src="/brand/queen-tovah-crest.webp" alt="" width="520" height="419" />
       <span class="brand-copy">
         <strong>Queen Tovah</strong>
         <small>Cares Foundation International</small>

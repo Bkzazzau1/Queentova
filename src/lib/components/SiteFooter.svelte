@@ -28,7 +28,7 @@
 <footer id="contact">
   <div class="container footer-grid">
     <div class="intro">
-      <img class="footer-logo" src="/brand/queen-tovah-crest.webp" width="260" height="196" alt="Queen Tovah Cares Foundation International logo" />
+      <img class="footer-logo" src="/brand/queen-tovah-crest.webp" width="520" height="419" alt="Queen Tovah Cares Foundation International logo" />
       <h2>{profile?.display_name || 'Queen Tovah Cares Foundation International'}</h2>
       <p>
         {profile?.short_description || 'Compassion with dignity. Opportunity with purpose. A global outlook rooted in service to people and communities.'}

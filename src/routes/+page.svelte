@@ -106,8 +106,8 @@
         class="official-logo"
         src="/brand/queen-tovah-logo-full.webp"
         alt="Queen Tovah Cares Foundation International logo"
-        width="380"
-        height="280"
+        width="840"
+        height="560"
       />
       <div class="identity-caption">
         <span>Global humanitarian service</span>

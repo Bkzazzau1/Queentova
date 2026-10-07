@@ -15,7 +15,7 @@
       <h1>{title} {#if accent}<span>{accent}</span>{/if}</h1>
       <p class="copy">{copy}</p>
     </div>
-    <img src="/brand/queen-tovah-crest.webp" alt="" aria-hidden="true" width="260" height="196" />
+    <img src="/brand/queen-tovah-crest.webp" alt="" aria-hidden="true" width="520" height="419" />
   </div>
 </section>
 

@@ -12,7 +12,7 @@
 <section class="error-page">
   <div class="orb"></div>
   <div class="container error-shell">
-    <img src="/brand/queen-tovah-logo-full.webp" width="380" height="280" alt="Queen Tovah Cares Foundation International" />
+    <img src="/brand/queen-tovah-logo-full.webp" width="840" height="560" alt="Queen Tovah Cares Foundation International" />
     <p class="eyebrow">{page.status}</p>
     <h1>{isNotFound ? 'This page has moved beyond our path.' : 'Something interrupted the journey.'}</h1>
     <p>
