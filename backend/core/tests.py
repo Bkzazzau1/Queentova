@@ -1,12 +1,13 @@
 from datetime import timedelta
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, Scholarship, ScholarshipApplication, ScholarshipApplicationDocument, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, ContactSubmission, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, Scholarship, ScholarshipApplication, ScholarshipApplicationDocument, Story, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -730,3 +731,79 @@ class PublicApiTests(TestCase):
 
         with self.assertRaises(ValidationError):
             scholarship.full_clean()
+
+
+
+class ExecutiveAdminDashboardTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_superuser(
+            username="executive-admin",
+            email="admin@example.com",
+            password="secure-test-password",
+        )
+        self.client.force_login(self.user)
+
+    def test_admin_index_renders_executive_dashboard_with_work_queues(self):
+        scholarship = Scholarship.objects.create(
+            title="Executive Scholarship",
+            slug="executive-scholarship",
+            summary="Dashboard test scholarship.",
+            status="published",
+        )
+        application = ScholarshipApplication.objects.create(
+            scholarship=scholarship,
+            first_name="Private",
+            last_name="Applicant",
+            email="private-applicant@example.com",
+            country="Nigeria",
+            financial_need_statement="PRIVATE NEED NARRATIVE SHOULD NOT APPEAR",
+            personal_statement="PRIVATE PERSONAL STATEMENT SHOULD NOT APPEAR",
+            consent_to_processing=True,
+            declaration_true=True,
+        )
+        SupportRequest.objects.create(
+            name="Support Applicant",
+            email="support@example.com",
+            country="Nigeria",
+            assistance_type=SupportRequest.AssistanceType.EDUCATION,
+            request_summary="PRIVATE SUPPORT SUMMARY SHOULD NOT APPEAR",
+            consent_to_contact=True,
+        )
+        VolunteerApplication.objects.create(
+            name="Volunteer Applicant",
+            email="volunteer-dashboard@example.com",
+            areas_of_interest="Education",
+        )
+        ContactSubmission.objects.create(
+            name="Partner Enquiry",
+            email="partner@example.com",
+            enquiry_type=ContactSubmission.EnquiryType.PARTNERSHIP,
+            message="PRIVATE ENQUIRY BODY SHOULD NOT APPEAR",
+        )
+        Story.objects.create(
+            title="Story Awaiting Approval",
+            slug="story-awaiting-approval",
+            excerpt="Editorial preview",
+            status="review",
+        )
+
+        response = self.client.get("/admin/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin/queen_tovah_index.html")
+        self.assertContains(response, "Foundation operations at a glance.")
+        self.assertContains(response, application.reference_code)
+        self.assertContains(response, "Support Applicant")
+        self.assertContains(response, "Volunteer Applicant")
+        self.assertContains(response, "Partner Enquiry")
+        self.assertContains(response, "Story Awaiting Approval")
+        self.assertNotContains(response, "PRIVATE NEED NARRATIVE SHOULD NOT APPEAR")
+        self.assertNotContains(response, "PRIVATE PERSONAL STATEMENT SHOULD NOT APPEAR")
+        self.assertNotContains(response, "PRIVATE SUPPORT SUMMARY SHOULD NOT APPEAR")
+        self.assertNotContains(response, "PRIVATE ENQUIRY BODY SHOULD NOT APPEAR")
+
+    def test_admin_dashboard_redirects_unauthenticated_users(self):
+        self.client.logout()
+        response = self.client.get("/admin/")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login/", response["Location"])
