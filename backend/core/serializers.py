@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from rest_framework import serializers
 
@@ -215,10 +215,15 @@ class ScholarshipApplicationCreateSerializer(serializers.ModelSerializer):
             if file_value:
                 documents[document_type] = file_value
 
-        application = ScholarshipApplication.objects.create(
-            scholarship=scholarship,
-            **validated_data,
-        )
+        try:
+            application = ScholarshipApplication.objects.create(
+                scholarship=scholarship,
+                **validated_data,
+            )
+        except IntegrityError as exc:
+            raise serializers.ValidationError({
+                "email": "An application for this scholarship already exists for this email address."
+            }) from exc
 
         for document_type, file_value in documents.items():
             ScholarshipApplicationDocument.objects.create(
