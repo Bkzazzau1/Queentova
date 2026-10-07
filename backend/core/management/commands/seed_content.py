@@ -3,7 +3,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from core.models import FAQ, FounderAchievement, FounderProfile, Program, SiteProfile, Story
+from core.models import FAQ, FounderAchievement, FounderProfile, HomepageSpotlight, Program, SiteProfile, Story
 
 
 class Command(BaseCommand):
@@ -132,6 +132,28 @@ class Command(BaseCommand):
         )
 
 
+
+
+
+        HomepageSpotlight.objects.update_or_create(
+            slug="amawbia-youth-sports-spotlight",
+            defaults={
+                "eyebrow": "Youth & community",
+                "title": "Sport as a meeting point for youth, unity and community.",
+                "summary": (
+                    "The Foundation's support for the 2025 Amawbia August League reflects a wider "
+                    "commitment to constructive youth engagement and stronger community life."
+                ),
+                "link_label": "Read the story",
+                "link_url": "/news/amawbia-august-league-2025",
+                "secondary_label": "Explore youth programs",
+                "secondary_url": "/programs/youth-sports",
+                "style": "editorial",
+                "priority": 10,
+                "display_order": 1,
+                **published,
+            },
+        )
 
         faqs = [
             (
