@@ -44,6 +44,11 @@ class PublicApiTests(TestCase):
         titles = [item["title"] for item in response.data["results"]]
         self.assertEqual(titles, ["Published Program"])
 
+    def test_backend_root_redirects_to_admin(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/admin/")
+
     def test_gallery_api_filters_by_program_and_hides_drafts(self):
         program = Program.objects.get(slug="published-program")
         GalleryItem.objects.create(title="Food drive", program=program, status="published")
