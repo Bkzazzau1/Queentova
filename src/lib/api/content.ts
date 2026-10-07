@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story';
   title: string;
   excerpt: string;
   url: string;
@@ -342,5 +342,27 @@ export interface HomepageSpotlight {
   ends_at: string | null;
   priority: number;
   display_order: number;
+  published_at: string | null;
+}
+
+
+export interface ImpactStory {
+  title: string;
+  slug: string;
+  excerpt: string;
+  body: string;
+  program_area: 'humanitarian' | 'education' | 'youth' | 'community' | 'livelihood' | 'other';
+  public_name: string;
+  age_group: 'not-stated' | 'child' | 'youth' | 'adult' | 'older-adult';
+  location_label: string;
+  image: string | null;
+  image_alt: string;
+  quote: string;
+  quote_attribution: string;
+  featured: boolean;
+  shared_with_consent: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
   published_at: string | null;
 }
