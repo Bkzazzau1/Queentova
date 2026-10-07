@@ -138,3 +138,23 @@ GitHub Actions verifies both sides of the platform:
 ### Guiding principle
 
 > It is good to be good.
+
+
+## Founder media source collection
+
+The founder recognition archive stores verified publication links separately from reusable photographs.
+
+To collect candidate photographs from allowlisted publication pages:
+
+```bash
+cd backend
+python manage.py sync_founder_media_sources
+```
+
+To review one archive item:
+
+```bash
+python manage.py sync_founder_media_sources --slug woman-of-the-decade-ahaejiejemba1
+```
+
+The collector never makes source photographs public automatically. Candidate external images are saved with `reuse_approved=false`. An authorised administrator must review image rights/permission and explicitly approve reuse, or upload a Foundation-owned copy, before the image can appear in the public API or website gallery.
