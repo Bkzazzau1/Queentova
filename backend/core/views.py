@@ -1,6 +1,7 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import filters, generics, permissions, status, viewsets
+from rest_framework import filters, generics, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,6 +26,7 @@ from .models import (
     PublishableModel,
     Resource,
     Scholarship,
+    ScholarshipApplication,
     SiteProfile,
     Story,
     SupportRequest,
@@ -50,6 +52,8 @@ from .serializers import (
     ProgramSerializer,
     ResourceSerializer,
     ScholarshipSerializer,
+    ScholarshipApplicationCreateSerializer,
+    ScholarshipApplicationStatusSerializer,
     SiteProfileSerializer,
     StorySerializer,
     SupportRequestSerializer,
@@ -112,6 +116,82 @@ class ScholarshipViewSet(PublishedReadOnlyViewSet):
     serializer_class = ScholarshipSerializer
     search_fields = ["title", "summary", "eligibility"]
     ordering_fields = ["opens_at", "closes_at", "published_at"]
+
+
+
+
+class ScholarshipApplicationCreateView(generics.CreateAPIView):
+    queryset = ScholarshipApplication.objects.none()
+    serializer_class = ScholarshipApplicationCreateSerializer
+    permission_classes = [permissions.AllowAny]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
+    throttle_scope = "scholarship_application"
+
+    def get_scholarship(self):
+        return get_object_or_404(
+            Scholarship,
+            slug=self.kwargs["slug"],
+            status=PublishableModel.PublicationStatus.PUBLISHED,
+        )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["scholarship"] = self.get_scholarship()
+        return context
+
+    def create(self, request, *args, **kwargs):
+        scholarship = self.get_scholarship()
+        serializer = self.get_serializer(
+            data=request.data,
+            context={**self.get_serializer_context(), "scholarship": scholarship},
+        )
+        serializer.is_valid(raise_exception=True)
+        application = serializer.save()
+
+        return Response(
+            {
+                "reference_code": application.reference_code,
+                "status": application.review_status,
+                "status_label": application.get_review_status_display(),
+                "scholarship": scholarship.title,
+                "submitted_at": application.submitted_at,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ScholarshipApplicationStatusView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "scholarship_status"
+
+    def post(self, request):
+        serializer = ScholarshipApplicationStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reference_code = serializer.validated_data["reference_code"].strip().upper()
+        email = serializer.validated_data["email"].strip().lower()
+
+        application = ScholarshipApplication.objects.select_related("scholarship").filter(
+            reference_code__iexact=reference_code,
+            email__iexact=email,
+        ).first()
+
+        if not application:
+            return Response(
+                {"detail": "Application not found for the supplied reference and email."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            {
+                "reference_code": application.reference_code,
+                "scholarship": application.scholarship.title,
+                "status": application.review_status,
+                "status_label": application.get_review_status_display(),
+                "submitted_at": application.submitted_at,
+                "reviewed_at": application.reviewed_at,
+            }
+        )
 
 
 class PartnerViewSet(PublishedReadOnlyViewSet):
