@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, CampaignUpdate, CampaignUpdateMedia, FAQ, FounderMediaItem, FounderMediaPhoto, HomepageSpotlight, ImpactStory, NewsletterSubscriber, Partner, PartnerCollaboration, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -412,3 +412,108 @@ class PublicApiTests(TestCase):
         response = self.client.get("/api/v1/activity-updates/youth-field-update/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["media"], [])
+
+
+    def test_partner_api_exposes_only_verified_published_relationships(self):
+        Partner.objects.create(
+            title="Verified Partner",
+            slug="verified-partner",
+            description="A verified relationship.",
+            verified_relationship=True,
+            verification_note="Confirmed by Foundation administration.",
+            status="published",
+        )
+        Partner.objects.create(
+            title="Unverified Partner",
+            slug="unverified-partner",
+            description="Should not be public.",
+            verified_relationship=False,
+            status="published",
+        )
+
+        response = self.client.get("/api/v1/partners/")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertIn("verified-partner", slugs)
+        self.assertNotIn("unverified-partner", slugs)
+
+    def test_partner_requires_verification_before_publication(self):
+        partner = Partner(
+            title="Unverified Publish Attempt",
+            slug="unverified-publish-attempt",
+            description="Should fail validation.",
+            verified_relationship=False,
+            status="published",
+        )
+
+        with self.assertRaises(ValidationError):
+            partner.full_clean()
+
+    def test_partner_collaboration_api_requires_verified_record_and_partner(self):
+        partner = Partner.objects.create(
+            title="Institution Partner",
+            slug="institution-partner",
+            description="Verified partner.",
+            verified_relationship=True,
+            verification_note="Relationship confirmed.",
+            status="published",
+        )
+        visible = PartnerCollaboration.objects.create(
+            partner=partner,
+            title="Education collaboration",
+            slug="education-collaboration",
+            summary="A verified collaboration.",
+            verified_record=True,
+            verification_note="Confirmed collaboration record.",
+            status="published",
+        )
+        hidden = PartnerCollaboration.objects.create(
+            partner=partner,
+            title="Unverified collaboration",
+            slug="unverified-collaboration",
+            summary="Should stay hidden.",
+            verified_record=False,
+            status="published",
+        )
+
+        response = self.client.get("/api/v1/partner-collaborations/?partner=institution-partner")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertIn(visible.slug, slugs)
+        self.assertNotIn(hidden.slug, slugs)
+
+    def test_activity_update_hides_unverified_partner_links(self):
+        verified = Partner.objects.create(
+            title="Verified Activity Partner",
+            slug="verified-activity-partner",
+            verified_relationship=True,
+            verification_note="Confirmed.",
+            status="published",
+        )
+        hidden = Partner.objects.create(
+            title="Hidden Activity Partner",
+            slug="hidden-activity-partner",
+            verified_relationship=False,
+            status="published",
+        )
+        program = Program.objects.create(
+            title="Partner Program",
+            slug="partner-program",
+            summary="Program linked to partners.",
+            status="published",
+        )
+        update = CampaignUpdate.objects.create(
+            title="Partner-supported delivery",
+            slug="partner-supported-delivery",
+            program=program,
+            kind="delivery",
+            summary="A public update.",
+            occurred_at=timezone.now(),
+            status="published",
+        )
+        update.partners.add(verified, hidden)
+
+        response = self.client.get("/api/v1/activity-updates/partner-supported-delivery/")
+        self.assertEqual(response.status_code, 200)
+        partner_slugs = [item["slug"] for item in response.data["partners"]]
+        self.assertEqual(partner_slugs, ["verified-activity-partner"])
