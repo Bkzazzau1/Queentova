@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Announcement, Campaign, FAQ, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
+from .models import Announcement, Campaign, FAQ, HomepageSpotlight, NewsletterSubscriber, Program, SupportRequest, VolunteerApplication
 
 
 class PublicApiTests(TestCase):
@@ -155,3 +155,30 @@ class PublicApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         slugs = [item["slug"] for item in response.data["results"]]
         self.assertEqual(slugs, ["active-announcement"])
+
+
+    def test_homepage_spotlight_api_hides_inactive_items(self):
+        now = timezone.now()
+        HomepageSpotlight.objects.create(
+            eyebrow="Featured",
+            title="Live Spotlight",
+            slug="live-spotlight",
+            summary="Visible on the homepage.",
+            link_url="/programs",
+            starts_at=now - timedelta(hours=1),
+            ends_at=now + timedelta(hours=1),
+            status="published",
+        )
+        HomepageSpotlight.objects.create(
+            eyebrow="Future",
+            title="Future Spotlight",
+            slug="future-spotlight",
+            summary="Not visible yet.",
+            link_url="/events",
+            starts_at=now + timedelta(hours=1),
+            status="published",
+        )
+        response = self.client.get("/api/v1/homepage-spotlights/")
+        self.assertEqual(response.status_code, 200)
+        slugs = [item["slug"] for item in response.data["results"]]
+        self.assertEqual(slugs, ["live-spotlight"])
