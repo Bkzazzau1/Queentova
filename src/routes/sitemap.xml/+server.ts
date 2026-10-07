@@ -8,6 +8,7 @@ const staticRoutes = [
   '/programs',
   '/causes',
   '/impact',
+  '/impact-stories',
   '/governance',
   '/news',
   '/events',
@@ -45,6 +46,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     await Promise.all([
       dynamicRoutes(fetch, 'programs', '/programs'),
       dynamicRoutes(fetch, 'stories', '/news'),
+      dynamicRoutes(fetch, 'impact-stories', '/impact-stories'),
       dynamicRoutes(fetch, 'campaigns', '/causes'),
       dynamicRoutes(fetch, 'events', '/events'),
       dynamicRoutes(fetch, 'scholarships', '/scholarships'),
