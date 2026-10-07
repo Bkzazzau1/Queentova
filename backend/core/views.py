@@ -11,6 +11,7 @@ from .models import (
     Event,
     FAQ,
     FounderAchievement,
+    FounderMediaItem,
     FounderProfile,
     GalleryItem,
     HomepageSpotlight,
@@ -34,6 +35,7 @@ from .serializers import (
     EventSerializer,
     FAQSerializer,
     FounderAchievementSerializer,
+    FounderMediaItemSerializer,
     FounderProfileSerializer,
     GalleryItemSerializer,
     HomepageSpotlightSerializer,
@@ -224,6 +226,17 @@ class SearchView(APIView):
                 "url": f"/faq#{item.slug}",
             })
 
+        for item in FounderMediaItem.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) |
+            Q(award_title__icontains=query) | Q(awarding_body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "founder-media",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/founder/media/{item.slug}",
+            })
+
         for item in ImpactStory.objects.filter(
             status=published,
             consent_status=ImpactStory.ConsentStatus.ACTIVE,
@@ -322,3 +335,16 @@ class ImpactStoryViewSet(PublishedReadOnlyViewSet):
             )
             .filter(Q(is_minor=False) | Q(guardian_consent=True))
         )
+
+
+class FounderMediaItemViewSet(PublishedReadOnlyViewSet):
+    queryset = FounderMediaItem.objects.prefetch_related("photos").all()
+    serializer_class = FounderMediaItemSerializer
+    search_fields = [
+        "title", "summary", "body", "award_title", "awarding_body",
+        "source_name", "location",
+    ]
+    ordering_fields = [
+        "display_order", "event_date", "publication_date",
+        "published_at", "title",
+    ]
