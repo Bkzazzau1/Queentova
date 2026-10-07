@@ -120,6 +120,82 @@ class FounderProfile(PublishableModel):
         return self.primary_name
 
 
+class FounderMediaItem(PublishableModel):
+    class Kind(models.TextChoices):
+        AWARD = "award", "Award & recognition"
+        ACHIEVEMENT = "achievement", "Achievement"
+        NEWS = "news", "News coverage"
+        INTERVIEW = "interview", "Interview"
+        PUBLICATION = "publication", "Publication"
+        COMMUNITY = "community", "Community appearance"
+
+    title = models.CharField(max_length=240)
+    slug = models.SlugField(max_length=260, unique=True)
+    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.NEWS)
+    summary = models.TextField()
+    body = models.TextField(blank=True)
+    event_date = models.DateField(blank=True, null=True, db_index=True)
+    publication_date = models.DateField(blank=True, null=True, db_index=True)
+    source_name = models.CharField(max_length=180)
+    source_url = models.URLField(max_length=600)
+    source_domain = models.CharField(max_length=180, blank=True)
+    source_reference = models.CharField(max_length=220, blank=True)
+    award_title = models.CharField(max_length=220, blank=True)
+    awarding_body = models.CharField(max_length=220, blank=True)
+    location = models.CharField(max_length=180, blank=True)
+    featured = models.BooleanField(default=False)
+    verified_source = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "-event_date", "-publication_date", "-published_at", "title"]
+        verbose_name = "Founder media item"
+        verbose_name_plural = "Founder media & recognition"
+
+    def __str__(self):
+        return self.title
+
+
+class FounderMediaPhoto(models.Model):
+    media_item = models.ForeignKey(
+        FounderMediaItem,
+        related_name="photos",
+        on_delete=models.CASCADE,
+    )
+    image = models.ImageField(upload_to="founder-media/%Y/%m/", blank=True, null=True)
+    external_image_url = models.URLField(max_length=900, blank=True)
+    alt_text = models.CharField(max_length=240)
+    caption = models.TextField(blank=True)
+    credit = models.CharField(max_length=220, blank=True)
+    source_url = models.URLField(max_length=600, blank=True)
+    reuse_approved = models.BooleanField(
+        default=False,
+        help_text="Must be enabled before an external/source image can appear publicly.",
+    )
+    is_primary = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "-is_primary", "id"]
+        verbose_name = "Founder media photo"
+        verbose_name_plural = "Founder media photos"
+
+    def __str__(self):
+        return f"{self.media_item.title} — {self.alt_text[:60]}"
+
+    def clean(self):
+        errors = {}
+        if not self.image and not self.external_image_url:
+            errors["image"] = "Upload an image or provide an external image URL."
+        if self.external_image_url and not self.reuse_approved:
+            errors["reuse_approved"] = (
+                "External/source images must be explicitly approved for reuse before publication."
+            )
+        if errors:
+            raise ValidationError(errors)
+
+
 class FounderAchievement(PublishableModel):
     title = models.CharField(max_length=220)
     slug = models.SlugField(max_length=240, unique=True)
