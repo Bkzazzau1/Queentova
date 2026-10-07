@@ -62,6 +62,7 @@
       <p class="label">Participate</p>
       <a href="/events">Events</a>
       <a href="/scholarships">Scholarships</a>
+      <a href="/scholarships/status">Check Scholarship Application</a>
       <a href="/request-support">Request Support</a>
       <a href="/resources">Reports & Resources</a>
       <a href="/media">Press & Media</a>
