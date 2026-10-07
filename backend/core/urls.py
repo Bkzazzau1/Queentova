@@ -21,6 +21,8 @@ from .views import (
     ProgramViewSet,
     ResourceViewSet,
     ScholarshipViewSet,
+    ScholarshipApplicationCreateView,
+    ScholarshipApplicationStatusView,
     SearchView,
     SiteProfileViewSet,
     StoryViewSet,
@@ -56,4 +58,14 @@ urlpatterns = [
     path("newsletter/", NewsletterSubscribeView.as_view(), name="newsletter-subscribe"),
     path("search/", SearchView.as_view(), name="site-search"),
     path("request-support/", SupportRequestCreateView.as_view(), name="support-request-create"),
+    path(
+        "scholarships/<slug:slug>/apply/",
+        ScholarshipApplicationCreateView.as_view(),
+        name="scholarship-application-create",
+    ),
+    path(
+        "scholarship-application-status/",
+        ScholarshipApplicationStatusView.as_view(),
+        name="scholarship-application-status",
+    ),
 ]
