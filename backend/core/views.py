@@ -404,7 +404,7 @@ class FounderMediaItemViewSet(PublishedReadOnlyViewSet):
 
 
 class CampaignUpdateViewSet(PublishedReadOnlyViewSet):
-    queryset = CampaignUpdate.objects.select_related("campaign", "program").prefetch_related("media").all()
+    queryset = CampaignUpdate.objects.select_related("campaign", "program").prefetch_related("media", "partners").all()
     serializer_class = CampaignUpdateSerializer
     search_fields = [
         "title", "summary", "body", "kind", "location_label",
