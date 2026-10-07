@@ -8,6 +8,7 @@ from .views import (
     EventViewSet,
     FAQViewSet,
     FounderAchievementViewSet,
+    FounderMediaItemViewSet,
     FounderProfileViewSet,
     GalleryItemViewSet,
     HomepageSpotlightViewSet,
@@ -34,6 +35,7 @@ router.register("gallery", GalleryItemViewSet, basename="gallery")
 router.register("homepage-spotlights", HomepageSpotlightViewSet, basename="homepage-spotlight")
 router.register("founders", FounderProfileViewSet, basename="founder")
 router.register("founder-achievements", FounderAchievementViewSet, basename="founder-achievement")
+router.register("founder-media", FounderMediaItemViewSet, basename="founder-media")
 router.register("impact", ImpactMetricViewSet, basename="impact")
 router.register("impact-stories", ImpactStoryViewSet, basename="impact-story")
 router.register("scholarships", ScholarshipViewSet, basename="scholarship")
