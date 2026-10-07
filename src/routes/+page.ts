@@ -3,6 +3,7 @@ import {
   getCollection,
   type Campaign,
   type EventItem,
+  type HomepageSpotlight,
   type Partner,
   type Program,
   type Scholarship,
@@ -15,5 +16,6 @@ export const load: PageLoad = async ({ fetch }) => ({
   campaigns: await getCollection<Campaign>(fetch, 'campaigns/?ordering=display_order'),
   events: await getCollection<EventItem>(fetch, 'events/?ordering=starts_at'),
   scholarships: await getCollection<Scholarship>(fetch, 'scholarships/?ordering=-opens_at'),
-  partners: await getCollection<Partner>(fetch, 'partners/?ordering=display_order')
+  partners: await getCollection<Partner>(fetch, 'partners/?ordering=display_order'),
+  spotlights: await getCollection<HomepageSpotlight>(fetch, 'homepage-spotlights/?ordering=display_order,-priority')
 });
