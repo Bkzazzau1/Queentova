@@ -10,6 +10,7 @@ from .models import (
     FounderAchievement,
     FounderProfile,
     GalleryItem,
+    HomepageSpotlight,
     ImpactMetric,
     NewsletterSubscriber,
     Partner,
@@ -78,6 +79,15 @@ class FounderAchievementAdmin(PublishWorkflowAdmin):
     list_filter = ("status", "year")
     search_fields = ("title", "description", "source_name")
     prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(HomepageSpotlight)
+class HomepageSpotlightAdmin(PublishWorkflowAdmin):
+    list_display = ("title", "style", "priority", "display_order", "starts_at", "ends_at", "status")
+    list_filter = ("status", "style")
+    search_fields = ("eyebrow", "title", "summary", "link_url")
+    prepopulated_fields = {"slug": ("title",)}
+    ordering = ("display_order", "-priority", "-published_at")
 
 
 @admin.register(ImpactMetric)
