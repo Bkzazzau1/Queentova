@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 
 from .models import (
@@ -7,6 +8,8 @@ from .models import (
     Event,
     FAQ,
     FounderAchievement,
+    FounderMediaItem,
+    FounderMediaPhoto,
     FounderProfile,
     GalleryItem,
     HomepageSpotlight,
@@ -270,3 +273,47 @@ class ImpactStorySerializer(serializers.ModelSerializer):
 
     def get_shared_with_consent(self, obj):
         return True
+
+
+class FounderMediaPhotoSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FounderMediaPhoto
+        fields = [
+            "image_url", "alt_text", "caption", "credit", "source_url",
+            "is_primary", "display_order",
+        ]
+
+    def get_image_url(self, obj):
+        request = self.context.get("request")
+        if obj.image:
+            url = obj.image.url
+            return request.build_absolute_uri(url) if request else url
+        if obj.external_image_url and obj.reuse_approved:
+            return obj.external_image_url
+        return None
+
+
+class FounderMediaItemSerializer(serializers.ModelSerializer):
+    photos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FounderMediaItem
+        fields = [
+            "title", "slug", "kind", "summary", "body", "event_date",
+            "publication_date", "source_name", "source_url", "source_domain",
+            "source_reference", "award_title", "awarding_body", "location",
+            "featured", "verified_source", "photos", "seo_title",
+            "seo_description", "seo_keywords", "published_at",
+        ]
+
+    def get_photos(self, obj):
+        approved = obj.photos.filter(
+            Q(image__isnull=False) | Q(reuse_approved=True)
+        )
+        return FounderMediaPhotoSerializer(
+            approved,
+            many=True,
+            context=self.context,
+        ).data
