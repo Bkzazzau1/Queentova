@@ -20,6 +20,7 @@ from .models import (
     ImpactStory,
     NewsletterSubscriber,
     Partner,
+    PartnerCollaboration,
     Program,
     PublishableModel,
     Resource,
@@ -45,6 +46,7 @@ from .serializers import (
     ImpactStorySerializer,
     NewsletterSubscriberSerializer,
     PartnerSerializer,
+    PartnerCollaborationSerializer,
     ProgramSerializer,
     ResourceSerializer,
     ScholarshipSerializer,
@@ -115,8 +117,28 @@ class ScholarshipViewSet(PublishedReadOnlyViewSet):
 class PartnerViewSet(PublishedReadOnlyViewSet):
     queryset = Partner.objects.all()
     serializer_class = PartnerSerializer
-    search_fields = ["title", "description"]
-    ordering_fields = ["display_order", "title"]
+    search_fields = ["title", "tagline", "description", "body", "country", "city"]
+    ordering_fields = ["display_order", "relationship_since", "title"]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(verified_relationship=True)
+
+
+class PartnerCollaborationViewSet(PublishedReadOnlyViewSet):
+    queryset = PartnerCollaboration.objects.select_related("partner", "program", "campaign").all()
+    serializer_class = PartnerCollaborationSerializer
+    search_fields = [
+        "title", "summary", "body", "partner__title",
+        "program__title", "campaign__title", "location_label",
+    ]
+    ordering_fields = ["display_order", "starts_at", "published_at", "title"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(verified_record=True)
+        partner_slug = self.request.query_params.get("partner", "").strip()
+        if partner_slug:
+            queryset = queryset.filter(partner__slug=partner_slug)
+        return queryset
 
 
 class CampaignViewSet(PublishedReadOnlyViewSet):
@@ -206,6 +228,20 @@ class SearchView(APIView):
                 "title": item.title,
                 "excerpt": item.summary,
                 "url": f"/causes/{item.slug}",
+            })
+
+        for item in Partner.objects.filter(
+            status=published,
+            verified_relationship=True,
+        ).filter(
+            Q(title__icontains=query) | Q(tagline__icontains=query) |
+            Q(description__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "partner",
+                "title": item.title,
+                "excerpt": item.tagline or item.description,
+                "url": f"/partners/{item.slug}",
             })
 
         for item in CampaignUpdate.objects.filter(status=published).filter(
@@ -382,7 +418,11 @@ class CampaignUpdateViewSet(PublishedReadOnlyViewSet):
             queryset = queryset.filter(campaign__slug=campaign_slug)
         if program_slug:
             queryset = queryset.filter(program__slug=program_slug)
+        partner_slug = self.request.query_params.get("partner", "").strip()
+
         if kind:
             queryset = queryset.filter(kind=kind)
+        if partner_slug:
+            queryset = queryset.filter(partners__slug=partner_slug).distinct()
 
         return queryset
