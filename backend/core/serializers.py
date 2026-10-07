@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import serializers
 
@@ -24,6 +27,8 @@ from .models import (
     PublishableModel,
     Resource,
     Scholarship,
+    ScholarshipApplication,
+    ScholarshipApplicationDocument,
     SiteProfile,
     Story,
     SupportRequest,
@@ -88,12 +93,147 @@ class ImpactMetricSerializer(serializers.ModelSerializer):
 
 
 class ScholarshipSerializer(serializers.ModelSerializer):
+    internal_applications_open = serializers.BooleanField(read_only=True)
+    results_summary = serializers.SerializerMethodField()
+
     class Meta:
         model = Scholarship
         fields = [
-            "title", "slug", "summary", "eligibility", "application_status",
-            "opens_at", "closes_at", "application_url", "published_at",
+            "title", "slug", "summary", "eligibility", "application_instructions",
+            "required_documents", "application_status", "opens_at", "closes_at",
+            "application_url", "internal_applications_enabled",
+            "internal_applications_open", "max_awards",
+            "public_results_released", "public_results_note",
+            "results_summary", "published_at",
         ]
+
+    def get_results_summary(self, obj):
+        if not obj.public_results_released:
+            return None
+
+        applications = obj.applications.all()
+        return {
+            "applications_received": applications.count(),
+            "eligible": applications.filter(
+                review_status__in=[
+                    ScholarshipApplication.ReviewStatus.ELIGIBLE,
+                    ScholarshipApplication.ReviewStatus.SHORTLISTED,
+                    ScholarshipApplication.ReviewStatus.APPROVED,
+                ]
+            ).count(),
+            "shortlisted": applications.filter(
+                review_status=ScholarshipApplication.ReviewStatus.SHORTLISTED
+            ).count(),
+            "selected": applications.filter(
+                review_status=ScholarshipApplication.ReviewStatus.APPROVED
+            ).count(),
+            "max_awards": obj.max_awards,
+        }
+
+
+class ScholarshipApplicationCreateSerializer(serializers.ModelSerializer):
+    academic_document = serializers.FileField(required=False, write_only=True)
+    identity_document = serializers.FileField(required=False, write_only=True)
+    admission_document = serializers.FileField(required=False, write_only=True)
+    recommendation_document = serializers.FileField(required=False, write_only=True)
+    supporting_document = serializers.FileField(required=False, write_only=True)
+
+    document_fields = {
+        "academic_document": ScholarshipApplicationDocument.DocumentType.ACADEMIC,
+        "identity_document": ScholarshipApplicationDocument.DocumentType.IDENTITY,
+        "admission_document": ScholarshipApplicationDocument.DocumentType.ADMISSION,
+        "recommendation_document": ScholarshipApplicationDocument.DocumentType.RECOMMENDATION,
+        "supporting_document": ScholarshipApplicationDocument.DocumentType.SUPPORTING,
+    }
+
+    class Meta:
+        model = ScholarshipApplication
+        fields = [
+            "first_name", "last_name", "email", "phone", "country", "city",
+            "institution", "course_of_study", "current_level", "academic_summary",
+            "financial_need_statement", "personal_statement",
+            "consent_to_processing", "declaration_true",
+            "academic_document", "identity_document", "admission_document",
+            "recommendation_document", "supporting_document",
+        ]
+
+    def validate_file(self, value):
+        if value.size > 8 * 1024 * 1024:
+            raise serializers.ValidationError("Each document must be 8 MB or smaller.")
+
+        extension = Path(value.name).suffix.lower()
+        if extension not in {".pdf", ".jpg", ".jpeg", ".png"}:
+            raise serializers.ValidationError(
+                "Documents must be PDF, JPG, JPEG or PNG files."
+            )
+        return value
+
+    def validate(self, attrs):
+        scholarship = self.context.get("scholarship")
+        if not scholarship:
+            raise serializers.ValidationError("Scholarship context is missing.")
+
+        if not scholarship.internal_applications_open:
+            raise serializers.ValidationError(
+                "Foundation-managed applications are not open for this scholarship."
+            )
+
+        if not attrs.get("consent_to_processing"):
+            raise serializers.ValidationError({
+                "consent_to_processing": "Consent is required to process this application."
+            })
+
+        if not attrs.get("declaration_true"):
+            raise serializers.ValidationError({
+                "declaration_true": "Confirm that the information supplied is accurate."
+            })
+
+        email = attrs.get("email", "").strip().lower()
+        if ScholarshipApplication.objects.filter(
+            scholarship=scholarship,
+            email__iexact=email,
+        ).exists():
+            raise serializers.ValidationError({
+                "email": "An application for this scholarship already exists for this email address."
+            })
+
+        for field_name in self.document_fields:
+            value = attrs.get(field_name)
+            if value:
+                self.validate_file(value)
+
+        attrs["email"] = email
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        scholarship = self.context["scholarship"]
+        documents = {}
+
+        for field_name, document_type in self.document_fields.items():
+            file_value = validated_data.pop(field_name, None)
+            if file_value:
+                documents[document_type] = file_value
+
+        application = ScholarshipApplication.objects.create(
+            scholarship=scholarship,
+            **validated_data,
+        )
+
+        for document_type, file_value in documents.items():
+            ScholarshipApplicationDocument.objects.create(
+                application=application,
+                document_type=document_type,
+                file=file_value,
+                original_name=file_value.name[:260],
+            )
+
+        return application
+
+
+class ScholarshipApplicationStatusSerializer(serializers.Serializer):
+    reference_code = serializers.CharField(max_length=20)
+    email = serializers.EmailField()
 
 
 class PartnerSerializer(serializers.ModelSerializer):
