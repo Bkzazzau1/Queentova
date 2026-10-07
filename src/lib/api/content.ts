@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media' | 'activity-update';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media' | 'activity-update' | 'partner';
   title: string;
   excerpt: string;
   url: string;
@@ -258,9 +258,50 @@ export interface Scholarship {
 export interface Partner {
   title: string;
   slug: string;
+  partner_type: 'corporate' | 'nonprofit' | 'government' | 'education' | 'media' | 'community' | 'professional' | 'other';
+  relationship_status: 'strategic' | 'active' | 'project' | 'supporter' | 'completed';
+  tagline: string;
   description: string;
+  body: string;
   website: string;
   logo: string | null;
+  hero_image: string | null;
+  hero_alt: string;
+  city: string;
+  country: string;
+  location: string;
+  relationship_since: string | null;
+  relationship_ended: string | null;
+  verified_relationship: boolean;
+  reference_url: string;
+  featured: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at: string | null;
+}
+
+export interface PartnerCollaboration {
+  title: string;
+  slug: string;
+  summary: string;
+  body: string;
+  collaboration_status: 'planned' | 'active' | 'completed' | 'ongoing';
+  partner_slug: string;
+  partner_title: string;
+  program_slug: string | null;
+  program_title: string | null;
+  campaign_slug: string | null;
+  campaign_title: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  location_label: string;
+  featured: boolean;
+  verified_record: boolean;
+  source_url: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
   published_at: string | null;
 }
 
@@ -428,6 +469,7 @@ export interface ActivityUpdate {
   campaign_title: string | null;
   program_slug: string | null;
   program_title: string | null;
+  partners: Partner[];
   expenditure_amount: string | null;
   expenditure_currency: string;
   expenditure_note: string;
