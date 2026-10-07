@@ -9,6 +9,8 @@ from .models import (
     Event,
     FAQ,
     FounderAchievement,
+    FounderMediaItem,
+    FounderMediaPhoto,
     FounderProfile,
     GalleryItem,
     HomepageSpotlight,
@@ -73,6 +75,30 @@ class FounderProfileAdmin(PublishWorkflowAdmin):
     list_display = ("primary_name", "public_record_name", "status", "updated_at")
     search_fields = ("primary_name", "public_record_name", "biography")
     prepopulated_fields = {"slug": ("primary_name",)}
+
+
+class FounderMediaPhotoInline(admin.TabularInline):
+    model = FounderMediaPhoto
+    extra = 0
+    fields = (
+        "image", "external_image_url", "alt_text", "caption", "credit",
+        "source_url", "reuse_approved", "is_primary", "display_order",
+    )
+
+
+@admin.register(FounderMediaItem)
+class FounderMediaItemAdmin(PublishWorkflowAdmin):
+    list_display = (
+        "title", "kind", "event_date", "source_name",
+        "verified_source", "featured", "status",
+    )
+    list_filter = ("status", "kind", "verified_source", "featured", "source_name")
+    search_fields = (
+        "title", "summary", "body", "award_title",
+        "awarding_body", "source_name", "source_url",
+    )
+    prepopulated_fields = {"slug": ("title",)}
+    inlines = [FounderMediaPhotoInline]
 
 
 @admin.register(FounderAchievement)
