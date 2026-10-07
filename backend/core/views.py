@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import (
     Announcement,
     Campaign,
+    CampaignUpdate,
     ContactSubmission,
     Event,
     FAQ,
@@ -31,6 +32,7 @@ from .models import (
 from .serializers import (
     AnnouncementSerializer,
     CampaignSerializer,
+    CampaignUpdateSerializer,
     ContactSubmissionSerializer,
     EventSerializer,
     FAQSerializer,
@@ -206,6 +208,17 @@ class SearchView(APIView):
                 "url": f"/causes/{item.slug}",
             })
 
+        for item in CampaignUpdate.objects.filter(status=published).filter(
+            Q(title__icontains=query) | Q(summary__icontains=query) |
+            Q(body__icontains=query) | Q(location_label__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "activity-update",
+                "title": item.title,
+                "excerpt": item.summary,
+                "url": f"/activity/{item.slug}",
+            })
+
         for item in Event.objects.filter(status=published).filter(
             Q(title__icontains=query) | Q(summary__icontains=query) | Q(body__icontains=query)
         )[:8]:
@@ -348,3 +361,28 @@ class FounderMediaItemViewSet(PublishedReadOnlyViewSet):
         "display_order", "event_date", "publication_date",
         "published_at", "title",
     ]
+
+
+class CampaignUpdateViewSet(PublishedReadOnlyViewSet):
+    queryset = CampaignUpdate.objects.select_related("campaign", "program").prefetch_related("media").all()
+    serializer_class = CampaignUpdateSerializer
+    search_fields = [
+        "title", "summary", "body", "kind", "location_label",
+        "campaign__title", "program__title", "verification_note",
+    ]
+    ordering_fields = ["display_order", "occurred_at", "published_at", "title"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        campaign_slug = self.request.query_params.get("campaign", "").strip()
+        program_slug = self.request.query_params.get("program", "").strip()
+        kind = self.request.query_params.get("kind", "").strip()
+
+        if campaign_slug:
+            queryset = queryset.filter(campaign__slug=campaign_slug)
+        if program_slug:
+            queryset = queryset.filter(program__slug=program_slug)
+        if kind:
+            queryset = queryset.filter(kind=kind)
+
+        return queryset
