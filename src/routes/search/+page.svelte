@@ -14,7 +14,8 @@
     event: 'Event',
     resource: 'Resource',
     faq: 'FAQ',
-    'impact-story': 'Story of Impact'
+    'impact-story': 'Story of Impact',
+    'founder-media': 'Founder Recognition & Media'
   };
 </script>
 
