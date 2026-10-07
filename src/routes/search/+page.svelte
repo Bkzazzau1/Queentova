@@ -12,6 +12,7 @@
     story: 'Story',
     campaign: 'Cause',
     event: 'Event',
+    scholarship: 'Scholarship',
     resource: 'Resource',
     faq: 'FAQ',
     'impact-story': 'Story of Impact',
