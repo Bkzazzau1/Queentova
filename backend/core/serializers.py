@@ -310,7 +310,7 @@ class FounderMediaItemSerializer(serializers.ModelSerializer):
 
     def get_photos(self, obj):
         approved = obj.photos.filter(
-            Q(image__isnull=False) | Q(reuse_approved=True)
+            (Q(image__isnull=False) & ~Q(image="")) | Q(reuse_approved=True)
         )
         return FounderMediaPhotoSerializer(
             approved,
