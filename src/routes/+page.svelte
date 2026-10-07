@@ -343,11 +343,23 @@
 {#if visiblePartners.length}
 <section class="partners">
   <div class="container">
-    <p class="eyebrow">Collaboration</p>
+    <div class="partner-head">
+      <div>
+        <p class="eyebrow">Verified collaboration</p>
+        <h2>Institutions connected to the mission.</h2>
+      </div>
+      <a href="/partners">View partner directory ↗</a>
+    </div>
     <div class="partner-row">
       {#each visiblePartners as partner}
-        {#if partner.website}<a href={partner.website} target="_blank" rel="noreferrer" aria-label={partner.title}>{#if partner.logo}<img src={partner.logo} alt={partner.title} />{:else}<span>{partner.title}</span>{/if}</a>
-        {:else}<div>{#if partner.logo}<img src={partner.logo} alt={partner.title} />{:else}<span>{partner.title}</span>{/if}</div>{/if}
+        <a href={`/partners/${partner.slug}`} aria-label={`View verified partner profile for ${partner.title}`}>
+          {#if partner.logo}
+            <img src={partner.logo} alt={partner.title} />
+          {:else}
+            <span>{partner.title}</span>
+          {/if}
+          <small>✓ Verified</small>
+        </a>
       {/each}
     </div>
   </div>
@@ -1119,6 +1131,25 @@
     color: #2b1827;
   }
 
+  .partner-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 34px;
+  }
+
+  .partner-head h2 {
+    margin: 0;
+    color: #3c2238;
+    font: 600 clamp(2rem,4vw,3.1rem)/.98 'Cormorant Garamond', Georgia, serif;
+  }
+
+  .partner-head > a {
+    color: #8e6020;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+
   .partner-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -1126,9 +1157,9 @@
     margin-top: 20px;
   }
 
-  .partner-row a,
-  .partner-row > div {
-    min-height: 84px;
+  .partner-row a {
+    position: relative;
+    min-height: 96px;
     display: grid;
     place-items: center;
     border: 1px solid rgba(80,45,70,.1);
@@ -1145,6 +1176,17 @@
     max-width: 100%;
     max-height: 46px;
     object-fit: contain;
+  }
+
+  .partner-row small {
+    position: absolute;
+    right: 8px;
+    bottom: 7px;
+    color: #668060;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
   }
 
   .founder {
@@ -1325,6 +1367,11 @@
 
     .partner-row {
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    .partner-head {
+      align-items: flex-start;
+      flex-direction: column;
     }
 
     .impact-copy {
