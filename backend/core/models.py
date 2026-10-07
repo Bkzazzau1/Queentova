@@ -1,4 +1,8 @@
+import uuid
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -359,6 +363,11 @@ class Scholarship(PublishableModel):
     slug = models.SlugField(max_length=240, unique=True)
     summary = models.TextField()
     eligibility = models.TextField(blank=True)
+    application_instructions = models.TextField(blank=True)
+    required_documents = models.TextField(
+        blank=True,
+        help_text="Public description of the documents applicants should prepare.",
+    )
     application_status = models.CharField(
         max_length=12,
         choices=ApplicationStatus.choices,
@@ -367,12 +376,197 @@ class Scholarship(PublishableModel):
     opens_at = models.DateTimeField(blank=True, null=True)
     closes_at = models.DateTimeField(blank=True, null=True)
     application_url = models.URLField(blank=True)
+    internal_applications_enabled = models.BooleanField(default=False)
+    max_awards = models.PositiveIntegerField(blank=True, null=True)
+    public_results_released = models.BooleanField(default=False)
+    public_results_note = models.TextField(blank=True)
 
     class Meta:
         ordering = ["-opens_at", "-created_at"]
 
     def __str__(self):
         return self.title
+
+    @property
+    def internal_applications_open(self):
+        if not self.internal_applications_enabled:
+            return False
+        if self.application_status != self.ApplicationStatus.OPEN:
+            return False
+
+        now = timezone.now()
+        if self.opens_at and self.opens_at > now:
+            return False
+        if self.closes_at and self.closes_at < now:
+            return False
+        return True
+
+    def clean(self):
+        errors = {}
+        if self.opens_at and self.closes_at and self.closes_at <= self.opens_at:
+            errors["closes_at"] = "Closing time must be after the opening time."
+        if self.internal_applications_enabled and self.application_url:
+            errors["application_url"] = (
+                "Use either Foundation-managed applications or an external official application URL, not both."
+            )
+        if errors:
+            raise ValidationError(errors)
+
+
+def scholarship_application_reference():
+    return f"QT-{uuid.uuid4().hex[:10].upper()}"
+
+
+def scholarship_document_path(instance, filename):
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin"
+    return (
+        f"private/scholarships/{instance.application.scholarship.slug}/"
+        f"{instance.application.reference_code}/{uuid.uuid4().hex}.{extension}"
+    )
+
+
+class ScholarshipApplication(models.Model):
+    class ReviewStatus(models.TextChoices):
+        SUBMITTED = "submitted", "Submitted"
+        SCREENING = "screening", "Screening"
+        ELIGIBLE = "eligible", "Eligible"
+        SHORTLISTED = "shortlisted", "Shortlisted"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        WITHDRAWN = "withdrawn", "Withdrawn"
+
+    scholarship = models.ForeignKey(
+        Scholarship,
+        related_name="applications",
+        on_delete=models.CASCADE,
+    )
+    reference_code = models.CharField(
+        max_length=20,
+        unique=True,
+        default=scholarship_application_reference,
+        editable=False,
+        db_index=True,
+    )
+
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=40, blank=True)
+    country = models.CharField(max_length=120)
+    city = models.CharField(max_length=120, blank=True)
+    institution = models.CharField(max_length=220, blank=True)
+    course_of_study = models.CharField(max_length=220, blank=True)
+    current_level = models.CharField(max_length=120, blank=True)
+    academic_summary = models.TextField(blank=True)
+    financial_need_statement = models.TextField()
+    personal_statement = models.TextField()
+
+    consent_to_processing = models.BooleanField(default=False)
+    declaration_true = models.BooleanField(default=False)
+
+    review_status = models.CharField(
+        max_length=16,
+        choices=ReviewStatus.choices,
+        default=ReviewStatus.SUBMITTED,
+        db_index=True,
+    )
+    eligibility_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    merit_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    need_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    overall_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    eligibility_note = models.TextField(blank=True)
+    reviewer_notes = models.TextField(blank=True)
+    assigned_reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="assigned_scholarship_applications",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="reviewed_scholarship_applications",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-submitted_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["scholarship", "email"],
+                name="unique_scholarship_application_email",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.reference_code} — {self.first_name} {self.last_name}"
+
+    def clean(self):
+        errors = {}
+        if not self.consent_to_processing:
+            errors["consent_to_processing"] = "Consent is required to process this scholarship application."
+        if not self.declaration_true:
+            errors["declaration_true"] = "The applicant declaration must be accepted."
+        if errors:
+            raise ValidationError(errors)
+
+
+class ScholarshipApplicationDocument(models.Model):
+    class DocumentType(models.TextChoices):
+        ACADEMIC = "academic", "Academic record / transcript"
+        IDENTITY = "identity", "Identity document"
+        ADMISSION = "admission", "Admission / enrolment evidence"
+        RECOMMENDATION = "recommendation", "Recommendation"
+        SUPPORTING = "supporting", "Other supporting document"
+
+    application = models.ForeignKey(
+        ScholarshipApplication,
+        related_name="documents",
+        on_delete=models.CASCADE,
+    )
+    document_type = models.CharField(
+        max_length=20,
+        choices=DocumentType.choices,
+        default=DocumentType.SUPPORTING,
+    )
+    file = models.FileField(upload_to=scholarship_document_path)
+    original_name = models.CharField(max_length=260)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["document_type", "uploaded_at"]
+
+    def __str__(self):
+        return f"{self.application.reference_code} — {self.get_document_type_display()}"
 
 
 class Partner(PublishableModel):
