@@ -15,6 +15,7 @@ from .models import (
     GalleryItem,
     HomepageSpotlight,
     ImpactMetric,
+    ImpactStory,
     NewsletterSubscriber,
     Partner,
     Program,
@@ -37,6 +38,7 @@ from .serializers import (
     GalleryItemSerializer,
     HomepageSpotlightSerializer,
     ImpactMetricSerializer,
+    ImpactStorySerializer,
     NewsletterSubscriberSerializer,
     PartnerSerializer,
     ProgramSerializer,
@@ -222,6 +224,21 @@ class SearchView(APIView):
                 "url": f"/faq#{item.slug}",
             })
 
+        for item in ImpactStory.objects.filter(
+            status=published,
+            consent_status=ImpactStory.ConsentStatus.ACTIVE,
+            story_consent=True,
+            privacy_reviewed=True,
+        ).filter(Q(is_minor=False) | Q(guardian_consent=True)).filter(
+            Q(title__icontains=query) | Q(excerpt__icontains=query) | Q(body__icontains=query)
+        )[:8]:
+            results.append({
+                "type": "impact-story",
+                "title": item.title,
+                "excerpt": item.excerpt,
+                "url": f"/impact-stories/{item.slug}",
+            })
+
         for item in Resource.objects.filter(status=published).filter(
             Q(title__icontains=query) | Q(summary__icontains=query) | Q(category__icontains=query)
         )[:8]:
@@ -285,4 +302,23 @@ class HomepageSpotlightViewSet(PublishedReadOnlyViewSet):
             .get_queryset()
             .filter(Q(starts_at__isnull=True) | Q(starts_at__lte=now))
             .filter(Q(ends_at__isnull=True) | Q(ends_at__gte=now))
+        )
+
+
+class ImpactStoryViewSet(PublishedReadOnlyViewSet):
+    queryset = ImpactStory.objects.all()
+    serializer_class = ImpactStorySerializer
+    search_fields = ["title", "excerpt", "body", "program_area", "location_label"]
+    ordering_fields = ["display_order", "published_at", "title"]
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                consent_status=ImpactStory.ConsentStatus.ACTIVE,
+                story_consent=True,
+                privacy_reviewed=True,
+            )
+            .filter(Q(is_minor=False) | Q(guardian_consent=True))
         )
