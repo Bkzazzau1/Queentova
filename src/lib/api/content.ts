@@ -205,7 +205,7 @@ export interface VolunteerPayload {
 }
 
 export interface SearchResult {
-  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story';
+  type: 'program' | 'story' | 'campaign' | 'event' | 'resource' | 'faq' | 'impact-story' | 'founder-media';
   title: string;
   excerpt: string;
   url: string;
@@ -361,6 +361,41 @@ export interface ImpactStory {
   quote_attribution: string;
   featured: boolean;
   shared_with_consent: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  published_at: string | null;
+}
+
+
+export interface FounderMediaPhoto {
+  image_url: string | null;
+  alt_text: string;
+  caption: string;
+  credit: string;
+  source_url: string;
+  is_primary: boolean;
+  display_order: number;
+}
+
+export interface FounderMediaItem {
+  title: string;
+  slug: string;
+  kind: 'award' | 'achievement' | 'news' | 'interview' | 'publication' | 'community';
+  summary: string;
+  body: string;
+  event_date: string | null;
+  publication_date: string | null;
+  source_name: string;
+  source_url: string;
+  source_domain: string;
+  source_reference: string;
+  award_title: string;
+  awarding_body: string;
+  location: string;
+  featured: boolean;
+  verified_source: boolean;
+  photos: FounderMediaPhoto[];
   seo_title?: string;
   seo_description?: string;
   seo_keywords?: string;
